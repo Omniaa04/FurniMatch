@@ -1,0 +1,23 @@
+// bloc/product_details_state.dart
+
+part of 'product_details_bloc.dart'; // إذا كنتِ تستخدمين BLoC
+
+abstract class ProductDetailsState {}
+
+class ProductDetailsInitial extends ProductDetailsState {} // الحالة الابتدائية
+
+class ProductDetailsLoading extends ProductDetailsState {} // جاري جلب البيانات
+
+class ProductDetailsLoaded extends ProductDetailsState {
+  final Product product; // المنتج الذي تم جلبه
+  final String selectedColor; // اللون المختار حالياً
+
+  ProductDetailsLoaded({required this.product, required this.selectedColor});
+  
+  // يفضل استخدام copyWith هنا
+}
+
+class ProductDetailsError extends ProductDetailsState {
+  final String message;
+  ProductDetailsError(this.message);
+}

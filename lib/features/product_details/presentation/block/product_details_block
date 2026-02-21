@@ -1,0 +1,41 @@
+// bloc/product_details_bloc.dart
+
+// ... import packages
+
+class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> {
+  
+
+  ProductDetailsBloc() : super(ProductDetailsInitial()) {
+    on<FetchProductDetails>(_onFetchProductDetails);
+    on<ChangeColorEvent>(_onChangeColor);
+  }
+
+  void _onFetchProductDetails(
+      FetchProductDetails event, Emitter<ProductDetailsState> emit) async {
+    emit(ProductDetailsLoading());
+    try {
+      
+      final Product dummyProduct = Product(
+        id: '1', name: 'Brown Comfy Mini Sofa', description: '...', 
+        price: 80.0, imageUrl: '...', rating: 4.9, 
+        colors: ['brown', 'dark_blue', 'red'], selectedColor: 'brown');
+
+      emit(ProductDetailsLoaded(product: dummyProduct, selectedColor: 'brown'));
+
+    } catch (e) {
+      emit(ProductDetailsError(e.toString()));
+    }
+  }
+  
+  void _onChangeColor(
+      ChangeColorEvent event, Emitter<ProductDetailsState> emit) {
+    final currentState = state;
+    if (currentState is ProductDetailsLoaded) {
+
+      emit(ProductDetailsLoaded(
+        product: currentState.product,
+        selectedColor: event.newColor,
+      ));
+    }
+  }
+}
