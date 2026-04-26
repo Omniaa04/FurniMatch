@@ -88,272 +88,16 @@ void _box(Canvas c, double x, double y, double w, double d, double h,
 Color _l(Color c, double t) => Color.lerp(c, Colors.white, t)!;
 Color _d(Color c, double t) => Color.lerp(c, Colors.black, t)!;
 
-void _drawShape(Canvas c, FurnitureItem f, double s, Offset pan) {
-  final x = f.position.dx, y = f.position.dy;
-  final col = f.tileColor;
-  final r = (((f.rotationDeg / 90).round() * 90) % 360).toDouble();
-  final w = f.effectiveWidth, d = f.effectiveDepth;
-  _drawFurnitureShape(c, f, x, y, w, d, col, r, s, pan);
-}
-
-void _drawFurnitureShape(Canvas c, FurnitureItem f, double x, double y,
-    double w, double d, Color col, double r, double s, Offset pan) {
-  switch (f.type) {
-    case FurnitureType.sofa:      _drawSofa(c, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.armchair:  _drawArmchair(c, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.bed:       _drawBed(c, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.diningTable:
-    case FurnitureType.coffeeTable:
-    case FurnitureType.desk:      _drawTable(c, f, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.wardrobe:  _drawWardrobe(c, f, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.tvStand:   _drawTvStand(c, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.bookshelf: _drawBookshelf(c, f, x, y, w, d, col, r, s, pan); break;
-    case FurnitureType.plant:     _drawPlant(c, x, y, w, d, col, s, pan); break;
-    case FurnitureType.lamp:      _drawLamp(c, x, y, w, d, col, s, pan); break;
-    case FurnitureType.bathtub:   _drawBathtub(c, x, y, w, d, col, r, s, pan); break;
-  }
-}
-
-void _drawSofa(Canvas c, double x, double y, double w, double d,
-    Color col, double r, double s, Offset pan) {
-  for (final lx in [x+.04, x+w-.10]) {
-    for (final ly in [y+.04, y+d-.10]) {
-      _box(c,lx,ly,.06,.06,.12,0,s,pan,_d(col,.55),_d(col,.65),_d(col,.60));
-    }
-  }
-  _box(c,x,y,w,d,.12,0,s,pan,_l(col,.10),_d(col,.35),_d(col,.20));
-  final sw2=(w-.08)/2;
-  for(int i=0;i<2;i++){
-    _box(c,x+.04+i*(sw2+.02),y+d*.22,sw2-.01,d*.55,.16,.12,s,pan,
-        _l(col,.32),_d(col,.18),_d(col,.08));
-  }
-  if(r==0||r==180){
-    final by = r==0 ? y : y+d-.18*d;
-    _box(c,x,by,w,d*.18,.52,.12,s,pan,_l(col,.18),_d(col,.40),_d(col,.24));
-    _box(c,x,y,.14,d,.40,.12,s,pan,_l(col,.16),_d(col,.38),_d(col,.22));
-    _box(c,x+w-.14,y,.14,d,.40,.12,s,pan,_l(col,.16),_d(col,.38),_d(col,.22));
-  } else {
-    final bx = r==90 ? x+w-.18*w : x;
-    _box(c,bx,y,w*.18,d,.52,.12,s,pan,_l(col,.18),_d(col,.40),_d(col,.24));
-    _box(c,x,y,w,.14,.40,.12,s,pan,_l(col,.16),_d(col,.38),_d(col,.22));
-    _box(c,x,y+d-.14,w,.14,.40,.12,s,pan,_l(col,.16),_d(col,.38),_d(col,.22));
-  }
-}
-
-void _drawArmchair(Canvas c, double x, double y, double w, double d,
-    Color col, double r, double s, Offset pan) {
-  for(final lx in [x+.03,x+w-.09]){
-    for(final ly in [y+.03,y+d-.09]){
-      _box(c,lx,ly,.06,.06,.12,0,s,pan,_d(col,.55),_d(col,.65),_d(col,.60));
-    }
-  }
-  _box(c,x,y,w,d,.12,0,s,pan,_l(col,.10),_d(col,.35),_d(col,.20));
-  _box(c,x+.12,y+d*.22,w-.24,d*.55,.14,.12,s,pan,_l(col,.32),_d(col,.18),_d(col,.08));
-  if(r==0||r==180){
-    final by = r==0 ? y : y+d-.18*d;
-    _box(c,x,by,w,d*.18,.48,.12,s,pan,_l(col,.18),_d(col,.38),_d(col,.22));
-    _box(c,x,y,.12,d,.36,.12,s,pan,_l(col,.16),_d(col,.36),_d(col,.20));
-    _box(c,x+w-.12,y,.12,d,.36,.12,s,pan,_l(col,.16),_d(col,.36),_d(col,.20));
-  } else {
-    final bx = r==90 ? x+w-.18*w : x;
-    _box(c,bx,y,w*.18,d,.48,.12,s,pan,_l(col,.18),_d(col,.38),_d(col,.22));
-    _box(c,x,y,w,.12,.36,.12,s,pan,_l(col,.16),_d(col,.36),_d(col,.20));
-    _box(c,x,y+d-.12,w,.12,.36,.12,s,pan,_l(col,.16),_d(col,.36),_d(col,.20));
-  }
-}
-
-void _drawBed(Canvas c, double x, double y, double w, double d,
-    Color col, double r, double s, Offset pan) {
-  for(final lx in [x+.04,x+w-.10]){
-    for(final ly in [y+.04,y+d-.10]){
-      _box(c,lx,ly,.08,.08,.22,0,s,pan,_d(col,.40),_d(col,.55),_d(col,.48));
-    }
-  }
-  _box(c,x,y,w,d,.25,0,s,pan,_l(col,.15),_d(col,.42),_d(col,.28));
-  _box(c,x,y,w,.10,.85,0,s,pan,_l(col,.18),_d(col,.44),_d(col,.30));
-  _box(c,x+.06,y+.01,w-.12,.07,.68,.10,s,pan,_l(col,.28),_d(col,.34),_d(col,.22));
-  _box(c,x,y+d-.08,w,.08,.35,0,s,pan,_l(col,.15),_d(col,.42),_d(col,.28));
-  _box(c,x+.04,y+.10,w-.08,d-.20,.22,.25,s,pan,
-      const Color(0xFFF5F0EA),const Color(0xFFDDD5CC),const Color(0xFFE8E0D8));
-  final bc=_l(col,.50);
-  _box(c,x+.04,y+d*.36,w-.08,d*.58,.08,.47,s,pan,
-      _l(bc,.10),_d(bc,.18),_d(bc,.08));
-  final pw=(w-.28)/2;
-  for(int i=0;i<2;i++){
-    _box(c,x+.08+i*(pw+.06),y+.11,pw,d*.20,.12,.47,s,pan,
-        Colors.white,const Color(0xFFE0D8D0),const Color(0xFFECE4DC));
-  }
-}
-
-void _drawTable(Canvas c, FurnitureItem f, double x, double y,
-    double w, double d, Color col, double r, double s, Offset pan) {
-  final isLow = f.type == FurnitureType.coffeeTable;
-  final legH  = isLow ? 0.32 : 0.68;
-  for(final lx in [x+.05,x+w-.12]){
-    for(final ly in [y+.05,y+d-.12]){
-      _box(c,lx,ly,.07,.07,legH,0,s,pan,_d(col,.28),_d(col,.48),_d(col,.38));
-    }
-  }
-  _box(c,x,y,w,d,.06,legH,s,pan,_l(col,.28),_d(col,.18),_l(col,.08));
-  if(f.type==FurnitureType.desk){
-    if(r==0||r==180){
-      final my = r==0 ? y+.02 : y+d-.07;
-      _box(c,x+w*.18,my,w*.60,.05,.30,legH+.06,s,pan,
-          const Color(0xFF1A1A2E),const Color(0xFF0D0D1A),const Color(0xFF16213E));
-    } else {
-      final mx = r==90 ? x+w-.07 : x+.02;
-      _box(c,mx,y+d*.18,.05,d*.60,.30,legH+.06,s,pan,
-          const Color(0xFF1A1A2E),const Color(0xFF0D0D1A),const Color(0xFF16213E));
-    }
-  }
-}
-
-void _drawWardrobe(Canvas c, FurnitureItem f, double x, double y,
-    double w, double d, Color col, double r, double s, Offset pan) {
-  _box(c,x+.02,y+.01,w-.04,d-.02,.06,0,s,pan,_d(col,.15),_d(col,.35),_d(col,.22));
-  _box(c,x,y,w,d,f.heightM,0,s,pan,_l(col,.20),_d(col,.30),col);
-  _box(c,x,y,w,d,.04,f.heightM-.04,s,pan,_l(col,.25),_d(col,.28),_l(col,.12));
-  if(r==0||r==180){
-    final dd=(w-.06)/2;
-    for(int i=0;i<2;i++){
-      _box(c,x+.03+i*(dd+.02),y,dd,.03,f.heightM*.88,.02,s,pan,
-          _l(col,.16),_d(col,.18),_l(col,.08));
-      final hx=x+.03+i*(dd+.02)+dd*.60;
-      _box(c,hx,y,.06,.025,.04,f.heightM*.45,s,pan,
-          const Color(0xFFD4AA66),const Color(0xFFA07840),const Color(0xFFBB9050));
-    }
-  } else {
-    final dd=(d-.06)/2;
-    for(int i=0;i<2;i++){
-      _box(c,x,y+.03+i*(dd+.02),.03,dd,f.heightM*.88,.02,s,pan,
-          _l(col,.16),_d(col,.18),_l(col,.08));
-      final hy=y+.03+i*(dd+.02)+dd*.60;
-      _box(c,x,.06+hy,.025,.06,.04,f.heightM*.45,s,pan,
-          const Color(0xFFD4AA66),const Color(0xFFA07840),const Color(0xFFBB9050));
-    }
-  }
-}
-
-void _drawTvStand(Canvas c, double x, double y, double w, double d,
-    Color col, double r, double s, Offset pan) {
-  for(final lx in [x+.05,x+w-.12]){
-    for(final ly in [y+.04,y+d-.10]){
-      _box(c,lx,ly,.07,.06,.16,0,s,pan,_d(col,.42),_d(col,.55),_d(col,.48));
-    }
-  }
-  _box(c,x,y,w,d,.36,.16,s,pan,_l(col,.22),_d(col,.22),col);
-  if(r==0||r==180){
-    final dw2=(w-.06)/2;
-    for(int i=0;i<2;i++){
-      _box(c,x+.03+i*(dw2+.02),y,dw2,.025,.34,.17,s,pan,
-          _l(col,.18),_d(col,.16),_l(col,.06));
-    }
-    _box(c,x+.04,y+.02,w-.08,.06,.44,.52,s,pan,
-        const Color(0xFF0D0D1A),const Color(0xFF080810),const Color(0xFF111122));
-    _box(c,x+.06,y+.025,w-.12,.04,.38,.55,s,pan,
-        const Color(0xFF1A2A3A),const Color(0xFF101820),const Color(0xFF152030));
-  } else {
-    final dw2=(d-.06)/2;
-    for(int i=0;i<2;i++){
-      _box(c,x,y+.03+i*(dw2+.02),.025,dw2,.34,.17,s,pan,
-          _l(col,.18),_d(col,.16),_l(col,.06));
-    }
-    _box(c,x+.02,y+.04,.06,d-.08,.44,.52,s,pan,
-        const Color(0xFF0D0D1A),const Color(0xFF080810),const Color(0xFF111122));
-    _box(c,x+.025,y+.06,.04,d-.12,.38,.55,s,pan,
-        const Color(0xFF1A2A3A),const Color(0xFF101820),const Color(0xFF152030));
-  }
-}
-
-void _drawBookshelf(Canvas c, FurnitureItem f, double x, double y,
-    double w, double d, Color col, double r, double s, Offset pan) {
-  _box(c,x,y,w,d,f.heightM,0,s,pan,_l(col,.20),_d(col,.30),col);
-  final isWide = r==0||r==180;
-  for(int i=1;i<=3;i++){
-    if(isWide){
-      _box(c,x+.03,y,w-.06,d,.04,f.heightM*i/4-.02,s,pan,
-          _l(col,.16),_d(col,.28),_l(col,.08));
-    } else {
-      _box(c,x,y+.03,w,d-.06,.04,f.heightM*i/4-.02,s,pan,
-          _l(col,.16),_d(col,.28),_l(col,.08));
-    }
-  }
-  final bkc=[
-    const Color(0xFFE74C3C),const Color(0xFF3498DB),const Color(0xFF27AE60),
-    const Color(0xFFE67E22),const Color(0xFF8E44AD),const Color(0xFF16A085),
-  ];
-  for(int sh=0;sh<4;sh++){
-    final bz=sh==0?0.03:f.heightM*sh/4+.04;
-    final bh=f.heightM/4-.10;
-    if(isWide){
-      final nbk=4+sh%2; final bkw=(w-.10)/nbk;
-      for(int b=0;b<nbk;b++){
-        final bc2=bkc[(sh*nbk+b)%bkc.length];
-        _box(c,x+.05+b*bkw,y+.02,bkw*.80,d*.60,bh*.90,bz,s,pan,
-            _l(bc2,.20),_d(bc2,.30),bc2);
-      }
-    } else {
-      final nbk=4+sh%2; final bkd=(d-.10)/nbk;
-      for(int b=0;b<nbk;b++){
-        final bc2=bkc[(sh*nbk+b)%bkc.length];
-        _box(c,x+.02,y+.05+b*bkd,w*.60,bkd*.80,bh*.90,bz,s,pan,
-            _l(bc2,.20),_d(bc2,.30),bc2);
-      }
-    }
-  }
-}
-
-void _drawPlant(Canvas c, double x, double y, double w, double d,
-    Color col, double s, Offset pan) {
-  _box(c,x+w*.15,y+d*.15,w*.70,d*.70,.26,0,s,pan,
-      const Color(0xFFD4785A),const Color(0xFF9B4530),const Color(0xFFBC6045));
-  _box(c,x+w*.18,y+d*.18,w*.64,d*.64,.03,.24,s,pan,
-      const Color(0xFF5C3D20),const Color(0xFF3A2410),const Color(0xFF4A3018));
-  _box(c,x+w*.42,y+d*.42,w*.16,d*.16,.50,.27,s,pan,
-      const Color(0xFF4A7C30),const Color(0xFF2A5018),const Color(0xFF3A6824));
-  _box(c,x+w*.04,y+d*.04,w*.62,d*.44,.20,.62,s,pan,
-      const Color(0xFF5CB85C),const Color(0xFF3A7A3A),const Color(0xFF4A9A4A));
-  _box(c,x+w*.28,y+d*.02,w*.60,d*.44,.20,.76,s,pan,
-      const Color(0xFF6EC96E),const Color(0xFF4A8A4A),const Color(0xFF5AB05A));
-  _box(c,x+w*.04,y+d*.46,w*.62,d*.44,.20,.70,s,pan,
-      const Color(0xFF52A852),const Color(0xFF386838),const Color(0xFF458845));
-  _box(c,x+w*.12,y+d*.20,w*.76,d*.52,.22,.88,s,pan,
-      const Color(0xFF78D878),const Color(0xFF509050),const Color(0xFF64B864));
-}
-
-void _drawLamp(Canvas c, double x, double y, double w, double d,
-    Color col, double s, Offset pan) {
-  _box(c,x+w*.20,y+d*.20,w*.60,d*.60,.06,0,s,pan,
-      const Color(0xFFCCBB88),const Color(0xFF887744),const Color(0xFFAA9966));
-  _box(c,x+w*.42,y+d*.42,w*.16,d*.16,1.20,.06,s,pan,
-      const Color(0xFFBBBBBB),const Color(0xFF888888),const Color(0xFFAAAAAA));
-  _box(c,x+w*.06,y+d*.06,w*.88,d*.88,.18,1.22,s,pan,
-      const Color(0xFFF5E8C0),const Color(0xFFCCBB88),const Color(0xFFE8D4A8));
-  _box(c,x+w*.12,y+d*.12,w*.76,d*.76,.14,1.24,s,pan,
-      const Color(0xFFFFF8E8),const Color(0xFFEEDD99),const Color(0xFFF8ECC4));
-}
-
-void _drawBathtub(Canvas c, double x, double y, double w, double d,
-    Color col, double r, double s, Offset pan) {
-  _box(c,x,y,w,d,.54,0,s,pan,
-      const Color(0xFFF0EBE6),const Color(0xFFCCC0B8),const Color(0xFFE4DBD4));
-  _box(c,x+.08,y+.08,w-.16,d-.16,.38,.10,s,pan,
-      const Color(0xFFB8D8EE),const Color(0xFF88B0CC),const Color(0xFFA4C8DC));
-  _box(c,x+w*.38,y,w*.24,.06,.12,.54,s,pan,
-      const Color(0xFFCCCCCC),const Color(0xFF999999),const Color(0xFFBBBBBB));
-  _box(c,x+.02,y+.02,w-.04,d-.04,.04,.50,s,pan,
-      const Color(0xFFF8F4F0),const Color(0xFFDDD5CC),const Color(0xFFEEE8E2));
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Room-only painter (floor + walls + grid, NO furniture shapes)
+// ─────────────────────────────────────────────────────────────────────────────
 class _RoomPainter extends CustomPainter {
   final double roomWidth, roomLength, roomHeight, scale;
-  final List<FurnitureItem> furniture;
   final Offset pan;
 
   _RoomPainter({
     required this.roomWidth, required this.roomLength,
-    required this.roomHeight, required this.furniture,
-    required this.scale, required this.pan,
+    required this.roomHeight, required this.scale, required this.pan,
   });
 
   Offset p(double x, double y, double z) => _iso(x, y, z, scale, pan);
@@ -362,12 +106,14 @@ class _RoomPainter extends CustomPainter {
   void paint(Canvas c, Size size) {
     final w = roomWidth, l = roomLength, h = roomHeight;
     final e = _kDark.withValues(alpha: .22);
+
     _face(c, [p(0,0,0),p(w,0,0),p(w,l,0),p(0,l,0)],
         const Color(0xFFF5D1A9), e, .7);
     _face(c, [p(0,0,0),p(0,l,0),p(0,l,h),p(0,0,h)],
         const Color(0xFFEBA46E), e, .7);
     _face(c, [p(0,0,0),p(w,0,0),p(w,0,h),p(0,0,h)],
         const Color(0xFFCF8D5B), e, .7);
+
     final cp = Path()
       ..moveTo(p(0,0,h).dx,p(0,0,h).dy)..lineTo(p(w,0,h).dx,p(w,0,h).dy)
       ..lineTo(p(w,l,h).dx,p(w,l,h).dy)..lineTo(p(0,l,h).dx,p(0,l,h).dy)
@@ -375,36 +121,132 @@ class _RoomPainter extends CustomPainter {
     c.drawPath(cp, Paint()
       ..color = _kDark.withValues(alpha: .14)
       ..style = PaintingStyle.stroke..strokeWidth = .8);
+
     final gp = Paint()
       ..color = _kDark.withValues(alpha: .09)..strokeWidth = .5;
     for (double xi = 0; xi <= w; xi++) c.drawLine(p(xi,0,0),p(xi,l,0),gp);
     for (double yi = 0; yi <= l; yi++) c.drawLine(p(0,yi,0),p(w,yi,0),gp);
-    final sorted = [...furniture]
-      ..sort((a,b) => (b.position.dx+b.position.dy)
-          .compareTo(a.position.dx+a.position.dy));
-    for (final f in sorted) {
-      _drawShape(c, f, scale, pan);
-      if (f.isSelected) {
-        final fx=f.position.dx, fy=f.position.dy;
-        final fw=f.effectiveWidth, fd=f.effectiveDepth;
-        final fh=f.heightM*0.20;
-        final sp = Path()
-          ..moveTo(p(fx,fy,fh).dx,p(fx,fy,fh).dy)
-          ..lineTo(p(fx+fw,fy,fh).dx,p(fx+fw,fy,fh).dy)
-          ..lineTo(p(fx+fw,fy+fd,fh).dx,p(fx+fw,fy+fd,fh).dy)
-          ..lineTo(p(fx,fy+fd,fh).dx,p(fx,fy+fd,fh).dy)..close();
-        c.drawPath(sp, Paint()
-          ..color = Colors.white.withValues(alpha: .92)
-          ..style = PaintingStyle.stroke..strokeWidth = 2.5
-          ..strokeJoin = StrokeJoin.round);
-      }
-    }
   }
 
   @override
   bool shouldRepaint(_) => true;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Selection outline painter — drawn on top of a GLB overlay when selected
+// ─────────────────────────────────────────────────────────────────────────────
+class _SelectionPainter extends CustomPainter {
+  final bool isSelected;
+  _SelectionPainter(this.isSelected);
+
+  @override
+  void paint(Canvas c, Size size) {
+    if (!isSelected) return;
+    final rr = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      const Radius.circular(10),
+    );
+    c.drawRRect(rr, Paint()
+      ..color = Colors.white.withValues(alpha: .92)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0);
+  }
+
+  @override
+  bool shouldRepaint(_SelectionPainter old) => old.isSelected != isSelected;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLB furniture tile — keeps its own ModelViewer alive and puts a transparent
+// GestureDetector ON TOP so the WebView never receives touches.
+// ─────────────────────────────────────────────────────────────────────────────
+class _FurnitureTile extends StatefulWidget {
+  final FurnitureItem item;
+  final bool isSelected;
+  final VoidCallback onSelect;
+  final VoidCallback onDoubleTap;
+  final void Function(DragUpdateDetails) onDrag;
+
+  const _FurnitureTile({
+    required this.item,
+    required this.isSelected,
+    required this.onSelect,
+    required this.onDoubleTap,
+    required this.onDrag,
+  });
+
+  @override
+  State<_FurnitureTile> createState() => _FurnitureTileState();
+}
+
+class _FurnitureTileState extends State<_FurnitureTile> {
+  // We keep a single ModelViewer alive; only the cameraOrbit changes when
+  // the user rotates, so we key it on the glbAsset path (stable).
+  late String _cameraOrbit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cameraOrbit = _orbitFor(widget.item.rotationDeg);
+  }
+
+  @override
+  void didUpdateWidget(_FurnitureTile old) {
+    super.didUpdateWidget(old);
+    if (old.item.rotationDeg != widget.item.rotationDeg) {
+      setState(() => _cameraOrbit = _orbitFor(widget.item.rotationDeg));
+    }
+  }
+
+  static String _orbitFor(double deg) {
+    final az = (45 + deg).toStringAsFixed(0);
+    return '${az}deg 55deg auto';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // ── Real GLB model (WebView, cameraControls OFF) ──────────────────
+        // Key includes rotationDeg so the WebView rebuilds (and re-renders
+        // at the new angle) only when the user explicitly rotates this item.
+        // All other setState calls (drag, select, resize of other items) leave
+        // the key unchanged → no flicker / reload for bystander furniture.
+        ModelViewer(
+          key: ValueKey('${widget.item.id}_${widget.item.rotationDeg.toStringAsFixed(0)}'),
+          src: widget.item.glbAsset,
+          alt: widget.item.name,
+          ar: false,
+          autoRotate: false,
+          cameraControls: false,   // ← keeps WebView from eating gestures
+          backgroundColor: Colors.transparent,
+          shadowIntensity: 0.7,
+          exposure: 1.1,
+          cameraOrbit: _cameraOrbit,
+          fieldOfView: '28deg',
+        ),
+
+        // ── Selection outline on top of GLB ──────────────────────────────
+        CustomPaint(painter: _SelectionPainter(widget.isSelected)),
+
+        // ── Transparent gesture interceptor — sits above WebView ─────────
+        // This widget catches 100 % of touches before the WebView does.
+        GestureDetector(
+          behavior: HitTestBehavior.opaque, // opaque = eat every touch
+          onTap: widget.onSelect,
+          onDoubleTap: widget.onDoubleTap,
+          onPanUpdate: widget.onDrag,
+          child: const SizedBox.expand(),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalog picker card
+// ─────────────────────────────────────────────────────────────────────────────
 class _LazyModelCard extends StatefulWidget {
   final FurnitureItem item;
   final VoidCallback onTap;
@@ -507,6 +349,9 @@ class _LazyModelCardState extends State<_LazyModelCard> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Full-screen GLB viewer (one WebView, opened on demand)
+// ─────────────────────────────────────────────────────────────────────────────
 class FurnitureModelViewer extends StatelessWidget {
   final FurnitureItem item;
   const FurnitureModelViewer({super.key, required this.item});
@@ -584,6 +429,9 @@ class FurnitureModelViewer extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Main screen
+// ─────────────────────────────────────────────────────────────────────────────
 class Room3DScreen extends StatefulWidget {
   final double roomWidth, roomLength, roomHeight;
   final String? referenceImagePath;
@@ -606,11 +454,9 @@ class _Room3DScreenState extends State<Room3DScreen> {
   double _roomRotation = 0.0;
   String? _selectedId;
   final List<FurnitureItem> _furniture = [];
-  // screen size captured on first build for auto-fit
   Size _screenSize = Size.zero;
   bool _isSaving = false;
   bool _isLoading = false;
-  // ← update when ngrok restarts
   static const _baseUrl = 'https://pout-tavern-refuse.ngrok-free.dev';
 
   static final List<FurnitureItem> _catalog = [
@@ -641,7 +487,7 @@ class _Room3DScreenState extends State<Room3DScreen> {
     FurnitureItem(id:'shelf',name:'Bookshelf',emoji:'📚',type:FurnitureType.bookshelf,
         glbAsset:'assets/models/bookshelf.glb',widthM:0.90,depthM:0.35,heightM:1.80,
         tileColor:const Color(0xFF9B6B45),position:Offset.zero),
-    FurnitureItem(id:'plant',name:'Plant',emoji:'🪴',type:FurnitureType.plant,
+    FurnitureItem(id:'plant',name:'Plant',emoji:'🌿',type:FurnitureType.plant,
         glbAsset:'assets/models/plant.glb',widthM:0.45,depthM:0.45,heightM:1.10,
         tileColor:const Color(0xFF4A7C40),position:Offset.zero),
     FurnitureItem(id:'lamp',name:'Floor Lamp',emoji:'💡',type:FurnitureType.lamp,
@@ -655,17 +501,12 @@ class _Room3DScreenState extends State<Room3DScreen> {
   @override
   void initState() { super.initState(); }
 
-  // Called on first build when we know the screen size.
-  // Calculates scale so the room fits the available canvas with padding.
   void _autoFit(Size size) {
     final w = widget.roomWidth, l = widget.roomLength;
-    // Isometric projected width and height of the room floor
-    final isoW = (w + l) * 0.866025; // horizontal span
-    final isoH = (w + l) * 0.5 + widget.roomHeight * 0.816; // vertical span
-    // Available canvas (leave padding and bottom bar space)
+    final isoW = (w + l) * 0.866025;
+    final isoH = (w + l) * 0.5 + widget.roomHeight * 0.816;
     final availW = size.width  - 80;
     final availH = size.height - 220;
-    // Pick scale that fits both axes
     final scaleW = availW / isoW;
     final scaleH = availH / isoH;
     _scale = (scaleW < scaleH ? scaleW : scaleH).clamp(20.0, 180.0);
@@ -676,7 +517,6 @@ class _Room3DScreenState extends State<Room3DScreen> {
     final w = widget.roomWidth, l = widget.roomLength;
     final screenW = _screenSize == Size.zero ? 400.0 : _screenSize.width;
     final screenH = _screenSize == Size.zero ? 700.0 : _screenSize.height;
-    // Center the isometric room in the available area
     final isoW = (w + l) * 0.866025 * _scale;
     final isoH = (w + l) * 0.5      * _scale;
     _panOffset = Offset(
@@ -694,35 +534,40 @@ class _Room3DScreenState extends State<Room3DScreen> {
     return null;
   }
 
-  void _onTap(TapUpDetails d) {
+  /// Screen-space center for a furniture item's GLB overlay.
+  Offset _furnitureScreenCenter(FurnitureItem f) {
+    final fx = f.position.dx + f.effectiveWidth / 2;
+    final fy = f.position.dy + f.effectiveDepth / 2;
+    final fz = f.heightM / 2;
+    return _iso(fx, fy, fz, _scale, _panOffset);
+  }
+
+  /// Pixel width of the overlay bounding box.
+  double _furniturePxW(FurnitureItem f) =>
+      f.effectiveWidth * _scale * 1.8 + f.heightM * _scale * 0.6;
+
+  /// Pixel height of the overlay bounding box.
+  double _furniturePxH(FurnitureItem f) =>
+      f.effectiveDepth * _scale * 1.2 + f.heightM * _scale * 1.0;
+
+  // ── tap on the bare floor / room canvas ───────────────────────────────────
+  void _onRoomTap(TapUpDetails d) {
     final fp = _toFloor(d.localPosition);
     if (fp == null) { setState(() => _selectedId = null); return; }
-    for (final f in _furniture.reversed) {
-      if (fp.dx >= f.position.dx &&
-          fp.dx <= f.position.dx + f.effectiveWidth &&
-          fp.dy >= f.position.dy &&
-          fp.dy <= f.position.dy + f.effectiveDepth) {
-        if (f.id == _selectedId) {
-          Navigator.push(context, MaterialPageRoute(
-              builder: (_) => FurnitureModelViewer(item: f)));
-        } else {
-          setState(() => _selectedId = f.id);
-        }
-        return;
-      }
-    }
+    // Only deselect if tapping empty floor (furniture taps handled by tiles)
     setState(() => _selectedId = null);
   }
 
-  void _onDrag(DragUpdateDetails d) {
-    if (_selectedId == null) return;
-    final idx = _furniture.indexWhere((f) => f.id == _selectedId);
+  // ── drag selected furniture via its tile's GestureDetector ────────────────
+  void _onFurnitureDrag(String id, DragUpdateDetails d) {
+    final idx = _furniture.indexWhere((f) => f.id == id);
     if (idx < 0) return;
     final f = _furniture[idx];
+    // Convert screen delta → floor-space delta (inverse iso)
     final mx = (d.delta.dx / .866025 + d.delta.dy / .5) / (2 * _scale);
     final my = (d.delta.dy / .5 - d.delta.dx / .866025) / (2 * _scale);
     final newPos = Offset(
-      (f.position.dx + mx).clamp(0, widget.roomWidth - f.effectiveWidth),
+      (f.position.dx + mx).clamp(0, widget.roomWidth  - f.effectiveWidth),
       (f.position.dy + my).clamp(0, widget.roomLength - f.effectiveDepth),
     );
     final moved = f.copyWith(position: newPos);
@@ -734,29 +579,48 @@ class _Room3DScreenState extends State<Room3DScreen> {
     final idx = _furniture.indexWhere((f) => f.id == _selectedId);
     if (idx < 0) return;
     final f = _furniture[idx];
-    final raw = (f.rotationDeg + deg) % 360;
+    final raw     = (f.rotationDeg + deg) % 360;
     final snapped = ((raw / 90).round() * 90) % 360;
-    final nr = (snapped < 0 ? snapped + 360 : snapped).toDouble();
+    final nr      = (snapped < 0 ? snapped + 360 : snapped).toDouble();
     final nw = (nr == 90 || nr == 270) ? f.depthM : f.widthM;
     final nd = (nr == 90 || nr == 270) ? f.widthM : f.depthM;
     final newPos = Offset(
-      f.position.dx.clamp(0, widget.roomWidth - nw),
+      f.position.dx.clamp(0, widget.roomWidth  - nw),
       f.position.dy.clamp(0, widget.roomLength - nd),
     );
-    final rotated = FurnitureItem(
-      id: f.id, name: f.name, glbAsset: f.glbAsset, emoji: f.emoji,
-      type: f.type, widthM: f.widthM, depthM: f.depthM, heightM: f.heightM,
-      tileColor: f.tileColor, position: newPos, rotationDeg: nr,
-    );
-    if (!_overlaps(rotated, _furniture)) {
-      setState(() => _furniture[idx] = f.copyWith(rotationDeg: nr, position: newPos));
-    }
+    setState(() =>
+        _furniture[idx] = f.copyWith(rotationDeg: nr, position: newPos));
   }
 
   void _delete() {
     setState(() {
       _furniture.removeWhere((f) => f.id == _selectedId);
       _selectedId = null;
+    });
+  }
+
+  // ── resize selected furniture (scale its width+depth, keep height) ─────────
+  void _resize(double factor) {
+    if (_selectedId == null) return;
+    final idx = _furniture.indexWhere((f) => f.id == _selectedId);
+    if (idx < 0) return;
+    final f = _furniture[idx];
+    // Clamp so it never leaves the room or becomes too small
+    final newW = (f.widthM  * factor).clamp(0.20, widget.roomWidth  - f.position.dx);
+    final newD = (f.depthM  * factor).clamp(0.20, widget.roomLength - f.position.dy);
+    setState(() {
+      _furniture[idx] = FurnitureItem(
+        id: f.id, name: f.name, glbAsset: f.glbAsset,
+        emoji: f.emoji, type: f.type,
+        widthM:  newW,
+        depthM:  newD,
+        heightM: (f.heightM * factor).clamp(0.10, 4.0),
+        tileColor: f.tileColor,
+        position: f.position,
+        topImageAsset: f.topImageAsset,
+        rotationDeg: f.rotationDeg,
+        isSelected: f.isSelected,
+      );
     });
   }
 
@@ -777,12 +641,12 @@ class _Room3DScreenState extends State<Room3DScreen> {
     final count = _furniture.where((f) => f.id.startsWith(cat.id)).length;
     final newId = '${cat.id}_$count';
     Offset freePos = Offset(
-      ((widget.roomWidth - cat.widthM) / 2).clamp(0, widget.roomWidth - cat.widthM),
+      ((widget.roomWidth  - cat.widthM) / 2).clamp(0, widget.roomWidth  - cat.widthM),
       ((widget.roomLength - cat.depthM) / 2).clamp(0, widget.roomLength - cat.depthM),
     );
     outer:
     for (double ty = 0; ty <= widget.roomLength - cat.depthM; ty += 0.3) {
-      for (double tx = 0; tx <= widget.roomWidth - cat.widthM; tx += 0.3) {
+      for (double tx = 0; tx <= widget.roomWidth  - cat.widthM; tx += 0.3) {
         final candidate = FurnitureItem(
           id: newId, name: cat.name, glbAsset: cat.glbAsset,
           emoji: cat.emoji, type: cat.type,
@@ -821,11 +685,8 @@ class _Room3DScreenState extends State<Room3DScreen> {
         'length': widget.roomLength,
         'height': widget.roomHeight,
         'furniture': _furniture.map((f) => {
-          'id': f.id,
-          'name': f.name,
-          'type': f.type.name,
-          'x': f.position.dx,
-          'y': f.position.dy,
+          'id': f.id, 'name': f.name, 'type': f.type.name,
+          'x': f.position.dx, 'y': f.position.dy,
           'rotation': f.rotationDeg,
         }).toList(),
       };
@@ -856,13 +717,11 @@ class _Room3DScreenState extends State<Room3DScreen> {
         Uri.parse('$_baseUrl/rooms/list'),
         headers: {'ngrok-skip-browser-warning': 'true'},
       );
-      if (res.statusCode == 200) {
-        rooms = jsonDecode(res.body) as List;
-      }
+      if (res.statusCode == 200) rooms = jsonDecode(res.body) as List;
     } catch (_) {}
     if (mounted) setState(() => _isLoading = false);
-
     if (!mounted) return;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -882,43 +741,34 @@ class _Room3DScreenState extends State<Room3DScreen> {
           const SizedBox(height: 12),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
+            child: Align(alignment: Alignment.centerLeft,
               child: Text('Saved Rooms',
                   style: TextStyle(fontSize: 18,
-                      fontWeight: FontWeight.bold, color: _kDark)),
-            ),
+                      fontWeight: FontWeight.bold, color: _kDark))),
           ),
           const SizedBox(height: 8),
           Expanded(
             child: rooms.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.inbox_outlined,
-                            size: 52, color: _kMedium),
-                        SizedBox(height: 8),
-                        Text('No saved rooms yet',
-                            style: TextStyle(color: _kMedium)),
-                      ],
-                    ))
+                ? const Center(child: Column(mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.inbox_outlined, size: 52, color: _kMedium),
+                      SizedBox(height: 8),
+                      Text('No saved rooms yet',
+                          style: TextStyle(color: _kMedium)),
+                    ]))
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     itemCount: rooms.length,
                     itemBuilder: (_, i) {
                       final r = rooms[i] as Map<String, dynamic>;
-                      final furnitureList =
-                          (r['furniture'] as List?) ?? [];
+                      final furnitureList = (r['furniture'] as List?) ?? [];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: _kLight,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                              color: _kPrimary.withValues(alpha: .3)),
+                          border: Border.all(color: _kPrimary.withValues(alpha: .3)),
                         ),
                         child: Row(children: [
                           Container(
@@ -942,47 +792,38 @@ class _Room3DScreenState extends State<Room3DScreen> {
                                 '${(r['width'] as num).toStringAsFixed(1)}m × '
                                 '${(r['length'] as num).toStringAsFixed(1)}m × '
                                 '${(r['height'] as num).toStringAsFixed(1)}m',
-                                style: const TextStyle(
-                                    color: _kMedium, fontSize: 12)),
-                              Text(
-                                '${furnitureList.length} furniture item(s)',
-                                style: const TextStyle(
-                                    color: _kPrimary,
-                                    fontSize: 11)),
+                                style: const TextStyle(color: _kMedium, fontSize: 12)),
+                              Text('${furnitureList.length} furniture item(s)',
+                                  style: const TextStyle(color: _kPrimary, fontSize: 11)),
                             ],
                           )),
-                          Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    IconButton(
-      icon: const Icon(Icons.download_outlined,
-          color: _kPrimary, size: 20),
-      tooltip: 'Load this room',
-      onPressed: () {
-        Navigator.pop(context);
-        _loadRoomData(r);
-      },
-    ),
-    IconButton(
-      icon: Icon(Icons.delete_outline,
-          color: Colors.red[400], size: 20),
-      tooltip: 'Delete',
-      onPressed: () async {
-        final id = r['id'] as int;
-        try {
-          await http.delete(
-            Uri.parse('$_baseUrl/rooms/$id'),
-            headers: {
-              'ngrok-skip-browser-warning': 'true'
-            },
-          );
-        } catch (_) {}
-        if (context.mounted) Navigator.pop(context);
-        _showSavedRooms();
-      },
-    ),
-  ],
-),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            IconButton(
+                              icon: const Icon(Icons.download_outlined,
+                                  color: _kPrimary, size: 20),
+                              tooltip: 'Load this room',
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _loadRoomData(r);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete_outline,
+                                  color: Colors.red[400], size: 20),
+                              tooltip: 'Delete',
+                              onPressed: () async {
+                                final id = r['id'] as int;
+                                try {
+                                  await http.delete(
+                                    Uri.parse('$_baseUrl/rooms/$id'),
+                                    headers: {'ngrok-skip-browser-warning': 'true'},
+                                  );
+                                } catch (_) {}
+                                if (context.mounted) Navigator.pop(context);
+                                _showSavedRooms();
+                              },
+                            ),
+                          ]),
                         ]),
                       );
                     }),
@@ -1001,25 +842,16 @@ class _Room3DScreenState extends State<Room3DScreen> {
       for (final item in furnitureList) {
         final m = item as Map<String, dynamic>;
         final typeName = m['type'] as String? ?? 'sofa';
-        // Find matching catalog item by type name
         final cat = _catalog.firstWhere(
-          (c) => c.type.name == typeName,
-          orElse: () => _catalog.first,
-        );
+          (c) => c.type.name == typeName, orElse: () => _catalog.first);
         _furniture.add(FurnitureItem(
           id: m['id'] as String? ?? '${typeName}_0',
           name: m['name'] as String? ?? cat.name,
-          glbAsset: cat.glbAsset,
-          emoji: cat.emoji,
-          type: cat.type,
-          widthM: cat.widthM,
-          depthM: cat.depthM,
-          heightM: cat.heightM,
-          tileColor: cat.tileColor,
+          glbAsset: cat.glbAsset, emoji: cat.emoji,
+          type: cat.type, widthM: cat.widthM, depthM: cat.depthM,
+          heightM: cat.heightM, tileColor: cat.tileColor,
           position: Offset(
-            (m['x'] as num).toDouble(),
-            (m['y'] as num).toDouble(),
-          ),
+            (m['x'] as num).toDouble(), (m['y'] as num).toDouble()),
           rotationDeg: (m['rotation'] as num).toDouble(),
         ));
       }
@@ -1056,12 +888,10 @@ class _Room3DScreenState extends State<Room3DScreen> {
           const SizedBox(height: 12),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
+            child: Align(alignment: Alignment.centerLeft,
               child: Text('Add Furniture',
                   style: TextStyle(fontSize: 18,
-                      fontWeight: FontWeight.bold, color: _kDark)),
-            ),
+                      fontWeight: FontWeight.bold, color: _kDark))),
           ),
           const SizedBox(height: 10),
           Expanded(
@@ -1073,8 +903,7 @@ class _Room3DScreenState extends State<Room3DScreen> {
               ),
               itemCount: _catalog.length,
               itemBuilder: (_, i) => _LazyModelCard(
-                item: _catalog[i], onTap: () => _addFurniture(_catalog[i]),
-              ),
+                item: _catalog[i], onTap: () => _addFurniture(_catalog[i])),
             ),
           ),
           const SizedBox(height: 16),
@@ -1090,17 +919,22 @@ class _Room3DScreenState extends State<Room3DScreen> {
             orElse: () => _furniture.first)
         : null;
 
+    // Back-to-front sort for correct z-order
+    final sortedFurniture = [..._furniture]
+      ..sort((a, b) => (b.position.dx + b.position.dy)
+          .compareTo(a.position.dx + a.position.dy));
+
     return Scaffold(
       backgroundColor: _kBg,
       appBar: AppBar(
         backgroundColor: _kDark,
         title: Text(
-          '${widget.roomWidth.toStringAsFixed(1)}m × ${widget.roomLength.toStringAsFixed(1)}m Room',
+          '${widget.roomWidth.toStringAsFixed(1)}m × '
+          '${widget.roomLength.toStringAsFixed(1)}m Room',
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true, elevation: 0,
         actions: [
-          // Load saved rooms
           IconButton(
             icon: _isLoading
                 ? const SizedBox(width: 18, height: 18,
@@ -1110,7 +944,6 @@ class _Room3DScreenState extends State<Room3DScreen> {
             tooltip: 'Load saved room',
             onPressed: _showSavedRooms,
           ),
-          // Save current room
           IconButton(
             icon: _isSaving
                 ? const SizedBox(width: 18, height: 18,
@@ -1123,204 +956,240 @@ class _Room3DScreenState extends State<Room3DScreen> {
         ],
       ),
       body: LayoutBuilder(builder: (context, constraints) {
-        // Auto-fit room to screen on first build
         if (_screenSize == Size.zero) {
           _screenSize = Size(constraints.maxWidth, constraints.maxHeight);
           _autoFit(_screenSize);
         }
         return Stack(children: [
-        GestureDetector(
-          onTapUp: _onTap,
-          onPanUpdate: _selectedId != null
-              ? _onDrag
-              : (d) => setState(() => _panOffset += d.delta),
-          child: Transform.rotate(
-            angle: _roomRotation * math.pi / 180,
-            child: CustomPaint(
-              painter: _RoomPainter(
-                roomWidth: widget.roomWidth, roomLength: widget.roomLength,
-                roomHeight: widget.roomHeight,
-                furniture: _furniture.map((f) =>
-                    f.copyWith(isSelected: f.id == _selectedId)).toList(),
-                scale: _scale, pan: _panOffset,
+
+          // ── 1. Room shell (floor + walls + grid) — receives room-pan & deselect
+          GestureDetector(
+            onTapUp: _onRoomTap,
+            onPanUpdate: _selectedId == null
+                ? (d) => setState(() => _panOffset += d.delta)
+                : null,
+            child: Transform.rotate(
+              angle: _roomRotation * math.pi / 180,
+              child: CustomPaint(
+                painter: _RoomPainter(
+                  roomWidth: widget.roomWidth, roomLength: widget.roomLength,
+                  roomHeight: widget.roomHeight, scale: _scale, pan: _panOffset,
+                ),
+                child: Container(color: Colors.transparent),
               ),
-              child: Container(color: Colors.transparent),
             ),
           ),
-        ),
 
-        if (widget.referenceImagePath != null)
-          Positioned(left: 14, top: 14,
-            child: GestureDetector(
-              onTap: () => showDialog(context: context,
-                  builder: (_) => Dialog(
-                      backgroundColor: Colors.transparent,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.file(File(widget.referenceImagePath!),
-                              fit: BoxFit.contain)))),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _kPrimary, width: 2),
-                  boxShadow: [BoxShadow(
-                      color: Colors.black.withValues(alpha: .2), blurRadius: 6)],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(File(widget.referenceImagePath!),
-                      width: 58, height: 58, fit: BoxFit.cover),
-                ),
-              ),
-            )),
+          // ── 2. GLB overlays — back-to-front, each with its own gesture layer ─
+          ...sortedFurniture.map((f) {
+            final center   = _furnitureScreenCenter(f);
+            final pxW      = _furniturePxW(f);
+            final pxH      = _furniturePxH(f);
+            final isSelected = f.id == _selectedId;
 
-        Positioned(right: 14, top: 14,
-          child: Column(children: [
-            _iconBtn(Icons.add,
-                () => setState(() => _scale = (_scale * 1.15).clamp(30, 240))),
-            const SizedBox(height: 8),
-            _iconBtn(Icons.remove,
-                () => setState(() => _scale = (_scale / 1.15).clamp(30, 240))),
-            const SizedBox(height: 8),
-            _iconBtn(Icons.center_focus_strong,
-                () => setState(() { _autoFit(_screenSize); })),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                color: _kDark.withValues(alpha: .7),
-                borderRadius: BorderRadius.circular(8),
+            return Positioned(
+              left:   center.dx - pxW / 2,
+              top:    center.dy - pxH / 2,
+              width:  pxW,
+              height: pxH,
+              child: _FurnitureTile(
+                item: f,
+                isSelected: isSelected,
+                onSelect: () => setState(() => _selectedId = f.id),
+                onDoubleTap: () {
+                  setState(() => _selectedId = f.id);
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => FurnitureModelViewer(item: f)));
+                },
+                onDrag: (d) {
+                  if (!isSelected) setState(() => _selectedId = f.id);
+                  _onFurnitureDrag(f.id, d);
+                },
               ),
-              child: const Text('View',
-                  style: TextStyle(color: Colors.white70, fontSize: 8)),
-            ),
-            const SizedBox(height: 4),
-            _iconBtn(Icons.rotate_left,
-                () => setState(() =>
-                    _roomRotation = (_roomRotation - 90) % 360)),
-            const SizedBox(height: 8),
-            _iconBtn(Icons.rotate_right,
-                () => setState(() =>
-                    _roomRotation = (_roomRotation + 90) % 360)),
-          ])),
+            );
+          }),
 
-        if (sel != null)
-          Positioned(top: 14, left: 0, right: 0,
-            child: Center(child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: _kDark.withValues(alpha: .82),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text('Tap again → full 3D view',
-                  style: TextStyle(color: Colors.white, fontSize: 11)),
-            ))),
-
-        if (sel != null)
-          Positioned(left: 0, right: 0, bottom: 112,
-            child: Center(child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                color: _kDark.withValues(alpha: .93),
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: [BoxShadow(
-                    color: Colors.black.withValues(alpha: .22), blurRadius: 12)],
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                _rotBtn(Icons.rotate_left, '90°', () => _rotate(-90)),
-                const SizedBox(width: 4),
-                _rotBtn(Icons.rotate_left, '45°', () => _rotate(-45), small: true),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => FurnitureModelViewer(item: sel))),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: _kPrimary,
-                        borderRadius: BorderRadius.circular(30)),
-                    child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.view_in_ar, color: Colors.white, size: 18),
-                      SizedBox(width: 6),
-                      Text('View 3D',
-                          style: TextStyle(color: Colors.white,
-                              fontWeight: FontWeight.bold, fontSize: 13)),
-                    ]),
+          // ── 3. Reference image thumbnail ──────────────────────────────────
+          if (widget.referenceImagePath != null)
+            Positioned(left: 14, top: 14,
+              child: GestureDetector(
+                onTap: () => showDialog(context: context,
+                    builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.file(File(widget.referenceImagePath!),
+                                fit: BoxFit.contain)))),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: _kPrimary, width: 2),
+                    boxShadow: [BoxShadow(
+                        color: Colors.black.withValues(alpha: .2), blurRadius: 6)],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(File(widget.referenceImagePath!),
+                        width: 58, height: 58, fit: BoxFit.cover),
                   ),
                 ),
-                const SizedBox(width: 8),
-                _rotBtn(Icons.rotate_right, '45°', () => _rotate(45), small: true),
-                const SizedBox(width: 4),
-                _rotBtn(Icons.rotate_right, '90°', () => _rotate(90)),
-              ]),
-            ))),
+              )),
 
-        Positioned(bottom: 0, left: 0, right: 0,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              boxShadow: [BoxShadow(
-                  color: Colors.black.withValues(alpha: .07), blurRadius: 12)],
-            ),
-            child: sel != null
-                ? Row(children: [
-                    Text(sel.emoji, style: const TextStyle(fontSize: 26)),
-                    const SizedBox(width: 12),
-                    Expanded(child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(sel.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: _kDark, fontSize: 15)),
-                          Text(
-                            '${sel.rotationDeg.toInt()}°  •  '
-                            '${sel.effectiveWidth.toStringAsFixed(1)}×'
-                            '${sel.effectiveDepth.toStringAsFixed(1)}m',
-                            style: const TextStyle(
-                                fontSize: 11, color: _kMedium),
-                          ),
-                        ])),
-                    GestureDetector(
-                      onTap: _delete,
-                      child: Container(
-                        padding: const EdgeInsets.all(9),
-                        decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: .10),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: const Icon(Icons.delete_outline,
-                            color: Colors.red, size: 20)),
+          // ── 4. Zoom / recenter / view-rotate controls ─────────────────────
+    Positioned(
+  right: 14,
+  top: 14,
+  child: Column(
+    children: [
+      _iconBtn(Icons.add,
+          () => setState(() => _scale = (_scale * 1.15).clamp(30, 240))),
+      const SizedBox(height: 8),
+      _iconBtn(Icons.remove,
+          () => setState(() => _scale = (_scale / 1.15).clamp(30, 240))),
+      const SizedBox(height: 8),
+      _iconBtn(Icons.center_focus_strong,
+          () => setState(() => _autoFit(_screenSize))),
+    ],
+  ),
+),
+
+          // ── 5. "Double-tap → full 3D" hint ────────────────────────────────
+          if (sel != null)
+            Positioned(top: 14, left: 0, right: 0,
+              child: Center(child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _kDark.withValues(alpha: .82),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text('Double-tap → full 3D view',
+                    style: TextStyle(color: Colors.white, fontSize: 11)),
+              ))),
+
+          // ── 6. Selected-furniture toolbar: rotate + resize + View3D ────────
+          if (sel != null)
+            Positioned(left: 0, right: 0, bottom: 112,
+              child: Center(child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _kDark.withValues(alpha: .93),
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [BoxShadow(
+                      color: Colors.black.withValues(alpha: .22), blurRadius: 12)],
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  // Rotate left 90°
+                  _rotBtn(Icons.rotate_left, '90°', () => _rotate(-90)),
+                  const SizedBox(width: 2),
+                  // Rotate left 45°
+                  _rotBtn(Icons.rotate_left, '45°', () => _rotate(-45), small: true),
+                  const SizedBox(width: 4),
+
+                  // ── Resize smaller ──
+                  _toolBtn(Icons.zoom_out, () => _resize(0.85)),
+                  const SizedBox(width: 2),
+                  // ── Resize larger ──
+                  _toolBtn(Icons.zoom_in,  () => _resize(1.15)),
+
+                  const SizedBox(width: 4),
+                  // View 3D
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => FurnitureModelViewer(item: sel))),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: _kPrimary,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.view_in_ar, color: Colors.white, size: 16),
+                        SizedBox(width: 4),
+                        Text('3D',
+                            style: TextStyle(color: Colors.white,
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                      ]),
                     ),
-                  ])
-                : Row(children: [
-                    const Icon(Icons.touch_app_outlined,
-                        color: _kMedium, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(
-                      _furniture.isEmpty
-                          ? 'Tap "Add Furniture" to start'
-                          : 'Tap to select  •  Drag to move  •  Tap again → 3D',
-                      style: const TextStyle(color: _kMedium, fontSize: 13),
-                    )),
-                    ElevatedButton.icon(
-                      onPressed: _showPicker,
-                      icon: const Icon(Icons.add, size: 15, color: Colors.white),
-                      label: const Text('Add Furniture',
-                          style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _kPrimary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                  ),
+
+                  const SizedBox(width: 4),
+                  // Rotate right 45°
+                  _rotBtn(Icons.rotate_right, '45°', () => _rotate(45), small: true),
+                  const SizedBox(width: 2),
+                  // Rotate right 90°
+                  _rotBtn(Icons.rotate_right, '90°', () => _rotate(90)),
+                ]),),
+              ))),
+
+          // ── 7. Bottom info / action bar ────────────────────────────────────
+          Positioned(bottom: 0, left: 0, right: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [BoxShadow(
+                    color: Colors.black.withValues(alpha: .07), blurRadius: 12)],
+              ),
+              child: sel != null
+                  ? Row(children: [
+                      Text(sel.emoji, style: const TextStyle(fontSize: 26)),
+                      const SizedBox(width: 12),
+                      Expanded(child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(sel.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: _kDark, fontSize: 15)),
+                            Text(
+                              '${sel.rotationDeg.toInt()}°  •  '
+                              '${sel.effectiveWidth.toStringAsFixed(1)}×'
+                              '${sel.effectiveDepth.toStringAsFixed(1)}m',
+                              style: const TextStyle(fontSize: 11, color: _kMedium),
+                            ),
+                          ])),
+                      // Delete button
+                      GestureDetector(
+                        onTap: _delete,
+                        child: Container(
+                          padding: const EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: .10),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.delete_outline,
+                              color: Colors.red, size: 20)),
                       ),
-                    ),
-                  ]),
-          )),
-      ]);
-        }),
+                    ])
+                  : Row(children: [
+                      const Icon(Icons.touch_app_outlined,
+                          color: _kMedium, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(
+                        _furniture.isEmpty
+                            ? 'Tap "Add Furniture" to start'
+                            : 'Tap → select  •  Drag → move  •  Double-tap → 3D',
+                        style: const TextStyle(color: _kMedium, fontSize: 13),
+                      )),
+                      ElevatedButton.icon(
+                        onPressed: _showPicker,
+                        icon: const Icon(Icons.add, size: 15, color: Colors.white),
+                        label: const Text('Add Furniture',
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _kPrimary,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ]),
+            )),
+        ]);
+      }),
     );
   }
 
@@ -1334,6 +1203,19 @@ class _Room3DScreenState extends State<Room3DScreen> {
             color: Colors.black.withValues(alpha: .10), blurRadius: 4)],
       ),
       child: Icon(icon, color: _kDark, size: 20),
+    ),
+  );
+
+  /// Small square tool button used in the selection toolbar.
+  Widget _toolBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Icon(icon, color: Colors.white, size: 20),
     ),
   );
 
