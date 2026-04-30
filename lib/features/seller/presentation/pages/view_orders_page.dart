@@ -17,12 +17,12 @@ class ViewAllOrdersPage extends StatefulWidget {
 class _ViewAllOrdersPageState extends State<ViewAllOrdersPage> {
   final controller = ViewOrdersController();
   final statuses = const [
-    'Preparing',
-    'Out for delivery',
-    'Shipped',
-    'Cancelled',
-  ];
-
+  'Preparing',
+  'Shipped',
+  'Out for delivery',
+  'Delivered',
+  'Cancelled',
+];
   @override
   void initState() {
     super.initState();

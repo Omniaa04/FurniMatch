@@ -223,21 +223,68 @@
 //     );
 //   }
 // }
+// ************************************************************************************************8
+// import 'package:flutter/material.dart';
+// // import 'package:furnimatch/features/buttom_nav/main_shell.dart';
+// import 'package:furnimatch/features/cart/injection_container.dart';
+// import 'package:furnimatch/features/splash/presentation/pages/splash_screen.dart';
+// import 'package:furnimatch/providers/cart_provider.dart';
+// import 'package:provider/provider.dart'; 
+// // import 'features/ai_chat/presentation/pages/chat_screen.dart';
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   initCartDependencies();
+//   runApp(MultiProvider(providers: [
+//     ChangeNotifierProvider(create: (_) => CartProvider()),
+//   ], child: const MyApp()));
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: const SplashScreen(),
+//     );
+//   }
+// }
+// **********************************************************************************************8
 
 import 'package:flutter/material.dart';
-import 'package:furnimatch/features/buttom_nav/main_shell.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:furnimatch/features/cart/injection_container.dart';
 import 'package:furnimatch/features/splash/presentation/pages/splash_screen.dart';
+import 'package:furnimatch/features/splash/cubit/splash_cubit.dart';
 import 'package:furnimatch/providers/cart_provider.dart';
-import 'package:provider/provider.dart'; // اسم الملف اللي فيه الكود اللي بعتهولك
-// import 'features/ai_chat/presentation/pages/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+
   initCartDependencies();
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => CartProvider()),
-  ], child: const MyApp()));
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => SplashCubit(prefs: prefs),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -247,7 +294,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainShell(),
+      home: SplashScreen(),
     );
   }
 }

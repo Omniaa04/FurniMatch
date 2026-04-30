@@ -1,14 +1,15 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:furnimatch/api_config.dart';
-import 'package:furnimatch/features/buttom_nav/main_shell.dart';
+import 'package:furnimatch/features/home/presentation/pages/home_page.dart';
 import 'package:furnimatch/features/profile/presentation/pages/about_us_page.dart';
 import 'package:furnimatch/features/seller/presentation/pages/add_product_page.dart';
 import 'package:furnimatch/features/seller/presentation/pages/product_analytics_page.dart';
 import 'package:furnimatch/features/seller/presentation/pages/seller_chat_details_page.dart';
 import 'package:furnimatch/features/seller/presentation/pages/view_orders_page.dart';
-import 'package:furnimatch/shared/widgets/app_dialog.dart';
 
 class SellerDashboardPage extends StatefulWidget {
   final int storeId;
@@ -148,13 +149,22 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
   }
 
   Future<void> deleteProduct(int productId) async {
-    final confirm = await AppDialog.confirm(
+    final confirm = await showDialog<bool>(
       context: context,
-      title: 'Delete Product',
-      message: 'Are you sure you want to delete this product?',
-      icon: Icons.delete_outline,
-      cancelText: 'Cancel',
-      confirmText: 'Delete',
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Product"),
+        content: const Text("Are you sure you want to delete this product?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
 
     if (confirm != true) return;
@@ -171,338 +181,54 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
     );
   }
 
-  Future<bool> setProductSale({
-    required int productId,
-    required double? salePrice,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/product/set-sale'),
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
-        body: jsonEncode({
-          'product_id': productId,
-          'sale_price': salePrice,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-      if (response.statusCode < 200 ||
-          response.statusCode >= 300 ||
-          data['success'] != true) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'] ?? 'Could not set sale')),
-          );
-        }
-        return false;
-      }
-
-      if (mounted) {
-        setState(() {
-          final index = products.indexWhere(
-            (product) => product['id'].toString() == productId.toString(),
-          );
-          if (index != -1) {
-            products[index] = {
-              ...products[index],
-              'sale_price': salePrice,
-            };
-          }
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              salePrice == null
-                  ? 'Sale removed successfully'
-                  : 'Sale price set successfully',
-            ),
-          ),
-        );
-      }
-
-      await fetchProducts();
-      return true;
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-      return false;
-    }
-  }
-
   Future<void> showSaleDialog(Map<String, dynamic> product) async {
-    final productId = int.tryParse('${product['id']}');
-    if (productId == null) return;
-
-    final currentSale = product['sale_price'];
-    final hasSale = _hasSalePrice(product);
-    final saleController = TextEditingController(
-      text: hasSale ? currentSale.toString() : '',
-    );
-    var isSaving = false;
+    final saleController = TextEditingController();
 
     await showDialog(
       context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (dialogContext, setDialogState) => AlertDialog(
-            backgroundColor: AppDialog.background,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-            titlePadding: const EdgeInsets.fromLTRB(28, 26, 28, 12),
-            contentPadding: const EdgeInsets.fromLTRB(28, 0, 28, 18),
-            actionsPadding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-            title: Text(
-              (product['name']?.toString() ?? 'Product').toLowerCase(),
-              style: const TextStyle(
-                color: AppDialog.brown,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Current Price: \$${_formatPrice(product['price'])}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppDialog.brown,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  hasSale
-                      ? 'Current Sale: \$${_formatPrice(currentSale)}'
-                      : 'Current Sale: No sale',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF56B37F),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: saleController,
-                  enabled: !isSaving,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  cursorColor: AppDialog.brown,
-                  style: const TextStyle(color: AppDialog.brown, fontSize: 16),
-                  decoration: InputDecoration(
-                    hintText: 'Enter sale price',
-                    hintStyle: const TextStyle(
-                      color: Color(0xFF6F625D),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 16,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFB8B1AA),
-                        width: 1.6,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppDialog.brown,
-                        width: 1.8,
-                      ),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFB8B1AA),
-                        width: 1.4,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              SizedBox(
-                width: double.infinity,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Row(
-                    children: [
-                      TextButton.icon(
-                        onPressed: isSaving
-                            ? null
-                            : () {
-                                Navigator.pop(dialogContext);
-                                deleteProduct(productId);
-                              },
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppDialog.red,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 12,
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Color(0xFF9FC9D9),
-                          size: 18,
-                        ),
-                        label: const Text(
-                          "Delete",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: isSaving
-                            ? null
-                            : () => Navigator.pop(dialogContext),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppDialog.muted,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 12,
-                          ),
-                        ),
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (hasSale) ...[
-                        const SizedBox(width: 8),
-                        TextButton(
-                          onPressed: isSaving
-                              ? null
-                              : () async {
-                                  setDialogState(() => isSaving = true);
-                                  final removed = await setProductSale(
-                                    productId: productId,
-                                    salePrice: null,
-                                  );
-
-                                  if (!dialogContext.mounted) return;
-                                  setDialogState(() => isSaving = false);
-                                  if (removed) Navigator.pop(dialogContext);
-                                },
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFFEBA46E),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text(
-                            "Remove Sale",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: isSaving
-                            ? null
-                            : () async {
-                                final saleText = saleController.text
-                                    .trim()
-                                    .replaceAll(',', '.');
-                                final salePrice = double.tryParse(saleText);
-                                if (salePrice == null || salePrice <= 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Enter a valid sale price'),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                setDialogState(() => isSaving = true);
-                                final saved = await setProductSale(
-                                  productId: productId,
-                                  salePrice: salePrice,
-                                );
-
-                                if (!dialogContext.mounted) return;
-                                setDialogState(() => isSaving = false);
-                                if (saved) Navigator.pop(dialogContext);
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppDialog.brown,
-                          disabledBackgroundColor:
-                              AppDialog.brown.withValues(alpha: 0.5),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: isSaving
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text(
-                                "Set Sale",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text(product['name'] ?? 'Product'),
+        content: TextField(
+          controller: saleController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: 'Enter sale price'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              deleteProduct(product['id']);
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
-        );
-      },
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final salePrice = double.tryParse(saleController.text);
+              if (salePrice == null) return;
+              await http.post(
+                Uri.parse('${ApiConfig.baseUrl}/product/set-sale'),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'ngrok-skip-browser-warning': 'true',
+                },
+                body: jsonEncode({
+                  'product_id': product['id'],
+                  'sale_price': salePrice,
+                }),
+              );
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              await fetchProducts();
+            },
+            child: const Text("Set Sale"),
+          ),
+        ],
+      ),
     );
-  }
-
-  bool _hasSalePrice(Map<String, dynamic> product) {
-    final salePrice = product['sale_price'];
-    if (salePrice == null) return false;
-    final value = double.tryParse(salePrice.toString());
-    return value != null && value > 0;
-  }
-
-  String _formatPrice(dynamic price) {
-    final value = double.tryParse(price?.toString() ?? '');
-    if (value == null) return '${price ?? ''}';
-    if (value == value.roundToDouble()) return value.toStringAsFixed(0);
-    return value.toStringAsFixed(2);
   }
 
   Future<void> showLogoutDialog() async {
@@ -516,8 +242,8 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 10),
         contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-        title: const Row(
-          children: [
+        title: Row(
+          children: const [
             Icon(Icons.logout, color: Color(0xFFFF5A5F), size: 28),
             SizedBox(width: 12),
             Text(
@@ -579,7 +305,7 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
     if (result == true && mounted) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const MainShell()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     }
@@ -769,7 +495,6 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
                                 const SizedBox(width: 12),
                             itemBuilder: (_, index) {
                               final product = products[index];
-                              final hasSale = _hasSalePrice(product);
                               return InkWell(
                                 onTap: () => showSaleDialog(product),
                                 child: Container(
@@ -819,37 +544,11 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
                                               ),
                                             ),
                                             const SizedBox(height: 4),
-                                            if (hasSale) ...[
-                                              Text(
-                                                '\$${_formatPrice(product['price'])}',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: Colors.grey,
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
-                                                  decorationThickness: 2,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Text(
-                                                '\$${_formatPrice(product['sale_price'])}',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: AppDialog.red,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ] else
-                                              Text(
-                                                '\$${_formatPrice(product['price'])}',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: brown,
-                                                ),
-                                              ),
+                                            Text(
+                                              '\$${product['sale_price'] ?? product['price']}',
+                                              style:
+                                                  const TextStyle(color: brown),
+                                            ),
                                           ],
                                         ),
                                       ),

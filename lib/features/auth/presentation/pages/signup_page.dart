@@ -5,6 +5,7 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/usecases/signup_usecase.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -49,6 +50,13 @@ class _SignUpPageState extends State<SignUpPage> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+      final prefs = await SharedPreferences.getInstance();
+
+await prefs.setInt('user_id', int.parse(user.userId.toString()));
+await prefs.setString('name', user.name);
+await prefs.setString('role', user.role);
+
+print("✅ Saved signup user_id: ${user.userId}");
 
       if (!mounted) return;
 

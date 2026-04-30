@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:furnimatch/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
@@ -89,7 +88,9 @@ void _box(Canvas c, double x, double y, double w, double d, double h,
 Color _l(Color c, double t) => Color.lerp(c, Colors.white, t)!;
 Color _d(Color c, double t) => Color.lerp(c, Colors.black, t)!;
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Room-only painter (floor + walls + grid, NO furniture shapes)
+// ─────────────────────────────────────────────────────────────────────────────
 class _RoomPainter extends CustomPainter {
   final double roomWidth, roomLength, roomHeight, scale;
   final Offset pan;
@@ -131,7 +132,9 @@ class _RoomPainter extends CustomPainter {
   bool shouldRepaint(_) => true;
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Selection outline painter — drawn on top of a GLB overlay when selected
+// ─────────────────────────────────────────────────────────────────────────────
 class _SelectionPainter extends CustomPainter {
   final bool isSelected;
   _SelectionPainter(this.isSelected);
@@ -153,6 +156,10 @@ class _SelectionPainter extends CustomPainter {
   bool shouldRepaint(_SelectionPainter old) => old.isSelected != isSelected;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GLB furniture tile — keeps its own ModelViewer alive and puts a transparent
+// GestureDetector ON TOP so the WebView never receives touches.
+// ─────────────────────────────────────────────────────────────────────────────
 class _FurnitureTile extends StatefulWidget {
   final FurnitureItem item;
   final bool isSelected;
@@ -173,15 +180,14 @@ class _FurnitureTile extends StatefulWidget {
 }
 
 class _FurnitureTileState extends State<_FurnitureTile> {
- 
+  // We keep a single ModelViewer alive; only the cameraOrbit changes when
+  // the user rotates, so we key it on the glbAsset path (stable).
   late String _cameraOrbit;
 
   @override
   void initState() {
     super.initState();
     _cameraOrbit = _orbitFor(widget.item.rotationDeg);
-   
-   
   }
 
   @override
@@ -202,7 +208,11 @@ class _FurnitureTileState extends State<_FurnitureTile> {
     return Stack(
       fit: StackFit.expand,
       children: [
-       
+        // ── Real GLB model (WebView, cameraControls OFF) ──────────────────
+        // Key includes rotationDeg so the WebView rebuilds (and re-renders
+        // at the new angle) only when the user explicitly rotates this item.
+        // All other setState calls (drag, select, resize of other items) leave
+        // the key unchanged → no flicker / reload for bystander furniture.
         ModelViewer(
           key: ValueKey('${widget.item.id}_${widget.item.rotationDeg.toStringAsFixed(0)}'),
           src: widget.item.glbAsset,
@@ -217,13 +227,13 @@ class _FurnitureTileState extends State<_FurnitureTile> {
           fieldOfView: '28deg',
         ),
 
-       
+        // ── Selection outline on top of GLB ──────────────────────────────
         CustomPaint(painter: _SelectionPainter(widget.isSelected)),
 
-        
-        
+        // ── Transparent gesture interceptor — sits above WebView ─────────
+        // This widget catches 100 % of touches before the WebView does.
         GestureDetector(
-          behavior: HitTestBehavior.opaque, 
+          behavior: HitTestBehavior.opaque, // opaque = eat every touch
           onTap: widget.onSelect,
           onDoubleTap: widget.onDoubleTap,
           onPanUpdate: widget.onDrag,
@@ -234,7 +244,9 @@ class _FurnitureTileState extends State<_FurnitureTile> {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalog picker card
+// ─────────────────────────────────────────────────────────────────────────────
 class _LazyModelCard extends StatefulWidget {
   final FurnitureItem item;
   final VoidCallback onTap;
@@ -337,7 +349,9 @@ class _LazyModelCardState extends State<_LazyModelCard> {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Full-screen GLB viewer (one WebView, opened on demand)
+// ─────────────────────────────────────────────────────────────────────────────
 class FurnitureModelViewer extends StatelessWidget {
   final FurnitureItem item;
   const FurnitureModelViewer({super.key, required this.item});
@@ -415,7 +429,9 @@ class FurnitureModelViewer extends StatelessWidget {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Main screen
+// ─────────────────────────────────────────────────────────────────────────────
 class Room3DScreen extends StatefulWidget {
   final double roomWidth, roomLength, roomHeight;
   final String? referenceImagePath;
@@ -441,7 +457,7 @@ class _Room3DScreenState extends State<Room3DScreen> {
   Size _screenSize = Size.zero;
   bool _isSaving = false;
   bool _isLoading = false;
-  static const _baseUrl = 'https://chance-impeding-curable.ngrok-free.dev';
+  static const _baseUrl = 'https://pout-tavern-refuse.ngrok-free.dev';
 
   static final List<FurnitureItem> _catalog = [
     FurnitureItem(id:'sofa',name:'Sofa',emoji:'🛋',type:FurnitureType.sofa,

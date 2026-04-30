@@ -3,11 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/cart_summary.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
+import 'package:furnimatch/features/checkout/presentation/screen/payment_method_screen.dart';
 
 class CartSummaryCard extends StatefulWidget {
   final CartSummary summary;
+  final int userId; // ✅ ضيفي ده
 
-  const CartSummaryCard({super.key, required this.summary});
+  const CartSummaryCard({
+    super.key,
+    required this.summary,
+    required this.userId, // ✅
+  });
 
   @override
   State<CartSummaryCard> createState() => _CartSummaryCardState();
@@ -39,7 +45,6 @@ class _CartSummaryCardState extends State<CartSummaryCard> {
       ),
       child: Column(
         children: [
-          // Promo code
           Row(
             children: [
               Expanded(
@@ -111,7 +116,14 @@ class _CartSummaryCardState extends State<CartSummaryCard> {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentMethodScreen(userId: widget.userId), // ✅
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF7D533D),
                 shape: RoundedRectangleBorder(
@@ -178,8 +190,9 @@ class _SummaryRow extends StatelessWidget {
             fontSize: isTotal ? 15 : 14,
             fontFamily: "Baloo2",
             fontWeight: isTotal ? FontWeight.w700 : FontWeight.w600,
-            color:
-                isDiscount ? const Color(0xFF7A5C3E) : const Color(0xFF2C2C2C),
+            color: isDiscount
+                ? const Color(0xFF7A5C3E)
+                : const Color(0xFF2C2C2C),
           ),
         ),
       ],

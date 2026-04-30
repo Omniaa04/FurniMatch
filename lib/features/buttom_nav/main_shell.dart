@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:furnimatch/features/RoomMeasurement/presentation/screen/measurement_screen.dart';
-import 'package:furnimatch/features/RoomMeasurement/presentation/screen/room_3d_screen.dart';
 import 'package:furnimatch/features/RoomMeasurement/presentation/screen/room_setup_screen.dart';
 import 'package:furnimatch/features/home/data/models/home_repository.dart';
 import 'package:furnimatch/features/notifications/presentation/screen/notifications_screen.dart';
@@ -78,7 +76,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         if (mounted) {
           context.read<CartProvider>().fetchCartCount(userId!);
           loadUnreadCount();
-          loadUnreadNotifCount(); 
+          loadUnreadNotifCount();
           startUnreadRefresh();
         }
       });
@@ -100,7 +98,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       const Duration(seconds: 15),
       (_) {
         loadUnreadCount();
-        loadUnreadNotifCount(); 
+        loadUnreadNotifCount();
       },
     );
   }
@@ -109,7 +107,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && isLoggedIn) {
       loadUnreadCount();
-      loadUnreadNotifCount(); 
+      loadUnreadNotifCount();
     }
   }
 
@@ -155,12 +153,12 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       sl<CartLocalDataSource>().setUserId(id);
       context.read<CartProvider>().fetchCartCount(id);
       loadUnreadCount();
-      loadUnreadNotifCount(); 
+      loadUnreadNotifCount();
       startUnreadRefresh();
     } else {
       _unreadRefreshTimer?.cancel();
       unreadCount = 0;
-      unreadNotifCount = 0; 
+      unreadNotifCount = 0;
       context.read<CartProvider>().resetCartCount();
     }
   }
@@ -176,7 +174,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   List<Widget> get pages {
     return [
       HomeScreen(
-        key: ValueKey('home-${userId ?? 'guest'}'),
+        key: const ValueKey('home'),
         userId: userId,
         userName: userName,
         onAuthChanged: updateAuth,
@@ -193,22 +191,24 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               },
             )
           : const _LoginRequiredTab(),
-     
       isLoggedIn
           ? NotificationsScreen(
               key: ValueKey('notifications-$userId'),
               userId: userId!,
-               onBack: () => onNavTap(0),
+              onBack: () => onNavTap(0),
             )
           : const _LoginRequiredTab(),
-   isLoggedIn
-    ? const RoomSetupScreen()
-    : const _LoginRequiredTab(),
+      isLoggedIn
+          ? RoomSetupScreen(onBackToHome: goHome)
+          : const _LoginRequiredTab(),
       isLoggedIn
           ? BlocProvider(
               key: ValueKey('cart-$userId'),
               create: (_) => sl<CartBloc>(),
-              child: CartPage(onBackToHome: goHome),
+              child: CartPage(
+                userId: userId ?? 0,
+                onBackToHome: goHome,
+              ),
             )
           : const _LoginRequiredTab(),
       isLoggedIn
@@ -223,15 +223,18 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   }
 
   void onNavTap(int index) {
-    if ((index == 1 || index == 4 || index == 5) && !isLoggedIn) {
+    // tabs that need login:
+    // 1 Inbox, 2 Notification, 3 3D, 4 Cart, 5 Profile
+    if (!isLoggedIn && index != 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in first!')),
       );
+      setState(() => currentIndex = 0);
+      return;
     }
 
-   
     if (index == 2) {
-      if (mounted) setState(() => unreadNotifCount = 0);
+      setState(() => unreadNotifCount = 0);
     } else {
       loadUnreadNotifCount();
     }
@@ -242,7 +245,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       loadUnreadCount();
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +259,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
             currentIndex: currentIndex,
             cartCount: cartProvider.cartCount,
             inboxCount: unreadCount,
-            notifCount: unreadNotifCount, 
+            notifCount: unreadNotifCount,
             onTap: onNavTap,
           );
         },
@@ -327,8 +329,5 @@ class _ComingSoonTab extends StatelessWidget {
         ),
       ),
     );
-
-
-  
   }
 }

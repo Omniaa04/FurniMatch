@@ -3,6 +3,8 @@ import 'package:furnimatch/features/buttom_nav/CustomBottomNav.dart';
 import 'package:furnimatch/features/buttom_nav/main_shell.dart';
 import 'package:furnimatch/features/home/data/models/home_repository.dart';
 import 'package:furnimatch/features/product/presentation/pages/product_details_page.dart';
+import 'package:furnimatch/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
 
 class CategoryProductsPage extends StatefulWidget {
   final String categoryName;
@@ -88,6 +90,30 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
     } catch (_) {
       _showSnack("Something went wrong");
     }
+  }
+
+  Future<void> _addToCart(Product product) async {
+    if (widget.userId == null) {
+      _showSnack("Please log in first!");
+      return;
+    }
+
+    if (product.isOutOfStock) {
+      _showSnack("Sorry, this product is out of stock!");
+      return;
+    }
+
+    final success = await context.read<CartProvider>().addToCart(
+          widget.userId!,
+          product.id,
+          1,
+        );
+
+    if (!mounted) return;
+
+    _showSnack(
+      success ? "Added to cart successfully" : "Could not add item to cart",
+    );
   }
 
   // ── Navigation ──
@@ -180,6 +206,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               product: product,
               isFavorite: _favoriteIds.contains(product.id),
               onFavoriteTap: () => _toggleFavorite(product),
+              onAddToCart: () => _addToCart(product),
             ),
           );
         },
@@ -188,10 +215,15 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
   }
 
   Widget _buildBottomNav() {
-    return CustomBottomNav(
-      currentIndex: _currentNavIndex,
-       notifCount: 0,
-      onTap: _onBottomNavTap,
+    return Consumer<CartProvider>(
+      builder: (context, cartProvider, _) {
+        return CustomBottomNav(
+          currentIndex: _currentNavIndex,
+          notifCount: 0,
+          cartCount: cartProvider.cartCount,
+          onTap: _onBottomNavTap,
+        );
+      },
     );
   }
 }
@@ -202,11 +234,13 @@ class _CategoryProductCard extends StatelessWidget {
   final Product product;
   final bool isFavorite;
   final VoidCallback onFavoriteTap;
+  final VoidCallback onAddToCart;
 
   const _CategoryProductCard({
     required this.product,
     required this.isFavorite,
     required this.onFavoriteTap,
+    required this.onAddToCart,
   });
 
   @override
@@ -386,19 +420,22 @@ class _CategoryProductCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: product.isOutOfStock
-                      ? Colors.grey.shade300
-                      : const Color(0xFF7D533D),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.add_shopping_cart,
-                  color: product.isOutOfStock ? Colors.white : Colors.white,
-                  size: 18,
+              GestureDetector(
+                onTap: onAddToCart,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: product.isOutOfStock
+                        ? Colors.grey.shade300
+                        : const Color(0xFF7D533D),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add_shopping_cart,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ),
               ),
             ],

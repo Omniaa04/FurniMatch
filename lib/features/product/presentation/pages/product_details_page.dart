@@ -14,6 +14,13 @@ import '../../domain/usecases/toggle_favorite_usecase.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/product_action_buttons.dart';
 import '../widgets/product_image_header.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:furnimatch/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:furnimatch/features/cart/presentation/bloc/cart_event.dart';
+import 'package:furnimatch/features/cart/injection_container.dart';
+import 'package:furnimatch/features/cart/data/datasources/cart_local_datasource.dart';
+// import 'package:furnimatch/features/cart/presentation/bloc/cart_bloc.dart';
+// import 'package:furnimatch/features/cart/presentation/bloc/cart_event.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -156,44 +163,49 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   Future<void> addToCartAndOpenCart() async {
-    if (widget.userId == null) {
-      showMessage("Please log in first!");
-      return;
-    }
+  if (widget.userId == null) {
+    showMessage("Please log in first!");
+    return;
+  }
 
-    if (isOutOfStock) {
-      showMessage("Sorry, this product is out of stock!");
-      return;
-    }
+  if (isOutOfStock) {
+    showMessage("Sorry, this product is out of stock!");
+    return;
+  }
 
-    try {
-      final cartProvider = context.read<CartProvider>();
+  try {
+    final cartProvider = context.read<CartProvider>();
 
-      final success = await cartProvider.addToCart(
-        widget.userId!,
-        productId,
-        1,
-      );
+    final success = await cartProvider.addToCart(
+      widget.userId!,
+      productId,
+      1,
+    );
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      if (success) {
-        await cartProvider.fetchCartCount(widget.userId!);
-        showMessage("Added to cart successfully ✅");
-        MainShell.openTab(
-          context,
-          index: 4,
-          userId: widget.userId,
-          userName: widget.userName,
-        );
-      } else {
-        showMessage("Could not add item to cart");
-      }
-    } catch (_) {
-      if (!mounted) return;
+    if (success) {
+  await cartProvider.fetchCartCount(widget.userId!);
+
+  sl<CartLocalDataSource>().setUserId(widget.userId!);
+  context.read<CartBloc>().add(LoadCartEvent());
+
+  showMessage("Added to cart successfully ✅");
+
+  MainShell.openTab(
+    context,
+    index: 4,
+    userId: widget.userId,
+    userName: widget.userName,
+  );
+} else {
       showMessage("Could not add item to cart");
     }
+  } catch (_) {
+    if (!mounted) return;
+    showMessage("Could not add item to cart");
   }
+}
 
   void onBottomNavTap(int index) {
     MainShell.openTab(
