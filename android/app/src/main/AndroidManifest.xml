@@ -7,10 +7,19 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-feature android:name="android.hardware.camera.ar" android:required="true"/>
+    <meta-data android:name="com.google.ar.core" android:value="required"/>
+    <meta-data android:name="io.flutter.embedding.android.EnableImpeller"
+    android:value="false" />
     <application
         android:label="flutter_application_1"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        android:exported="true"
+
+         <meta-data
+           android:name="io.flutter.embedding.android.EnableImpeller"
+           android:value="false" />
         
         <!-- Google Maps API Key - اضفناه هنا داخل <application> -->
         <!-- غيري YOUR_API_KEY_HERE بالـ API Key بتاعتك -->
