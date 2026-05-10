@@ -1,0 +1,24 @@
+name: room_measurement_app
+description: "Room Measurement Feature"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.4
+  equatable: ^2.0.5
+  shared_preferences: ^2.2.2
+  arcore_flutter_plugin: ^0.1.0
+  uuid: ^4.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
