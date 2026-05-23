@@ -4,11 +4,12 @@ import 'package:furnimatch/features/notifications/domain/notifications_controlle
 class NotificationsScreen extends StatefulWidget {
   final int userId;
   final VoidCallback? onBack;
+
   const NotificationsScreen({
-    
-    super.key, required this.userId,
-     this.onBack
-    });
+    super.key,
+    required this.userId,
+    this.onBack,
+  });
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -16,6 +17,10 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   late final NotificationsController _controller;
+  static const Color _darkBrown = Color(0xFF7D533D);
+  static const Color _bgColor = Color(0xFFF6F0E9);
+  static const Color _fieldColor = Color(0xFFEFE9E2);
+  static const Color _accent = Color(0xFFAD8B73);
 
   @override
   void initState() {
@@ -39,27 +44,42 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: _bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: _bgColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-     leading: IconButton(
-  icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-  onPressed: () => widget.onBack?.call(), 
-),
-        title: const Text(
-          'Notifications',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+        automaticallyImplyLeading: false,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: _darkBrown,
+                size: 22,
+              ),
+              onPressed: widget.onBack ?? () => Navigator.maybePop(context),
+            ),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Notifications',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: _darkBrown,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
       ),
       body: _controller.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: _darkBrown),
+            )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -68,7 +88,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Container(
                     height: 38,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEDE8E3),
+                      color: _fieldColor,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Row(
@@ -97,7 +117,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ? const Center(
                           child: Text(
                             'No notifications',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: _accent),
                           ),
                         )
                       : ListView.separated(
@@ -122,7 +142,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5EDE5),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -140,7 +160,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ? Icons.shopping_cart_outlined
                   : Icons.chat_bubble_outline,
               size: 18,
-              color: const Color(0xFFC4845A),
+              color: _darkBrown,
             ),
           ),
           const SizedBox(width: 12),
@@ -152,16 +172,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   n['text'] ?? '',
                   style: const TextStyle(
                     fontSize: 12.5,
-                    color: Colors.black87,
+                    color: Color(0xFF2C2C2C),
                     height: 1.45,
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   n['created_at'] ?? '',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
-                    color: Colors.brown.shade300,
+                    color: _accent,
                   ),
                 ),
               ],
@@ -175,7 +195,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 height: 8,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xFFC4845A),
+                  color: _darkBrown,
                 ),
               ),
             ),
@@ -192,7 +212,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(3),
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFFC4845A) : Colors.transparent,
+            color: isActive ? _darkBrown : Colors.transparent,
             borderRadius: BorderRadius.circular(25),
           ),
           alignment: Alignment.center,
@@ -201,7 +221,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isActive ? Colors.white : Colors.black54,
+              color: isActive ? Colors.white : _darkBrown,
             ),
           ),
         ),

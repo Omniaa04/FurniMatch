@@ -29,6 +29,10 @@ dependencies:
   equatable: ^2.0.5
   camera: ^0.10.5+9              
   permission_handler: ^11.0.1
+  share_plus: ^12.0.2
+  flutter_map: ^8.3.0
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
   
 
 dev_dependencies:
@@ -43,5 +47,8 @@ flutter:
   - assets/models/sofa.glb
     # - family: Baloo2
     #   fonts:
-    #     - asset: assets/fonts/Baloo2-Regular.ttf
+  - assets/images/paypal.png
+  - assets/images/apple_pay.png
+  - assets/images/cod_truck.png
+  - assets/fonts/Baloo2-Regular.ttf
     #     - asset: assets/fonts/Baloo2-Bold.ttf

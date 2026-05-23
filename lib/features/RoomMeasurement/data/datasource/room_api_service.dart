@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:furnimatch/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/room_dimensions.dart';
 
 class RoomApiService {
+  // ← update this every time you restart ngrok
+  static String get _baseUrl => ApiConfig.baseUrl;
 
-  static const String _baseUrl = 'https://chance-impeding-curable.ngrok-free.dev';
+  // ── Auth ──────────────────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>> register({
     required String name,
@@ -55,7 +58,7 @@ class RoomApiService {
     return token != null;
   }
 
-  
+  // ── Rooms ─────────────────────────────────────────────────────────────────
 
   Future<bool> saveRoom({
     required String name,

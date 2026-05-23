@@ -7,6 +7,7 @@ import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
 import 'forget_password_page.dart';
 import 'signup_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -37,34 +38,42 @@ class _LoginPageState extends State<LoginPage> {
     loginUseCase = LoginUseCase(repository);
   }
 
-  Future<void> login() async {
-    if (!formKey.currentState!.validate()) return;
+ Future<void> login() async {
+  if (!formKey.currentState!.validate()) return;
 
-    setState(() => isLoading = true);
+  setState(() => isLoading = true);
 
-    try {
-      final user = await loginUseCase(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+  try {
+    final user = await loginUseCase(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
-      if (!mounted) return;
+    final prefs = await SharedPreferences.getInstance();
 
-      Navigator.pop(context, {
-        'user_id': user.userId,
-        'name': user.name,
-        'role': user.role,
-      });
-    } catch (e) {
-      if (!mounted) return;
+    await prefs.setInt('user_id', int.parse(user.userId.toString()));
+    await prefs.setString('name', user.name);
+    await prefs.setString('role', user.role);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
-      );
-    } finally {
-      if (mounted) setState(() => isLoading = false);
-    }
+    print("✅ Saved user_id: ${user.userId}");
+
+    if (!mounted) return;
+
+    Navigator.pop(context, {
+      'user_id': user.userId,
+      'name': user.name,
+      'role': user.role,
+    });
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+    );
+  } finally {
+    if (mounted) setState(() => isLoading = false);
   }
+}
 
   @override
   void dispose() {

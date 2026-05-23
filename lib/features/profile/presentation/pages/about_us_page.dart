@@ -90,9 +90,9 @@ class AboutUsPage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Our Mission Card
-              _InfoCard(
+              const _InfoCard(
                 title: 'Our Mission:',
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.only(top: 8),
                   child: Text(
                     'To Make Furniture Trading Simple, Sustainable, And Stylish'
@@ -109,11 +109,11 @@ class AboutUsPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Our Promise Card
-              _InfoCard(
+              const _InfoCard(
                 title: 'Our Promise:',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     SizedBox(height: 10),
                     _PromiseItem(emoji: '🪑', text: 'Safe Transactions'),
                     SizedBox(height: 8),

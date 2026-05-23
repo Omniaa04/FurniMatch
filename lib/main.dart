@@ -227,7 +227,6 @@
 import 'package:flutter/material.dart';
 import 'package:furnimatch/features/buttom_nav/main_shell.dart';
 import 'package:furnimatch/features/cart/injection_container.dart';
-import 'package:furnimatch/features/splash/presentation/pages/splash_screen.dart';
 import 'package:furnimatch/providers/cart_provider.dart';
 import 'package:provider/provider.dart'; // اسم الملف اللي فيه الكود اللي بعتهولك
 // import 'features/ai_chat/presentation/pages/chat_screen.dart';

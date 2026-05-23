@@ -28,7 +28,7 @@ class AppRoutes {
       case home:
         // Fallback for backward compatibility
         return MaterialPageRoute(
-          builder: (_) => MainShell(
+          builder: (_) => const MainShell(
             userId: null,
             userName: null,
             initialIndex: 0,

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:furnimatch/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
@@ -59,7 +58,9 @@ Offset _iso(double x, double y, double z, double s, Offset pan) => Offset(
 
 void _face(Canvas c, List<Offset> pts, Color fill, Color stroke, double sw) {
   final path = Path()..moveTo(pts[0].dx, pts[0].dy);
-  for (final o in pts.skip(1)) path.lineTo(o.dx, o.dy);
+  for (final o in pts.skip(1)) {
+    path.lineTo(o.dx, o.dy);
+  }
   path.close();
   c.drawPath(path, Paint()..color = fill);
   if (sw > 0) {
@@ -89,7 +90,9 @@ void _box(Canvas c, double x, double y, double w, double d, double h,
 Color _l(Color c, double t) => Color.lerp(c, Colors.white, t)!;
 Color _d(Color c, double t) => Color.lerp(c, Colors.black, t)!;
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Room-only painter (floor + walls + grid, NO furniture shapes)
+// ─────────────────────────────────────────────────────────────────────────────
 class _RoomPainter extends CustomPainter {
   final double roomWidth, roomLength, roomHeight, scale;
   final Offset pan;
@@ -123,15 +126,21 @@ class _RoomPainter extends CustomPainter {
 
     final gp = Paint()
       ..color = _kDark.withValues(alpha: .09)..strokeWidth = .5;
-    for (double xi = 0; xi <= w; xi++) c.drawLine(p(xi,0,0),p(xi,l,0),gp);
-    for (double yi = 0; yi <= l; yi++) c.drawLine(p(0,yi,0),p(w,yi,0),gp);
+    for (double xi = 0; xi <= w; xi++) {
+      c.drawLine(p(xi,0,0),p(xi,l,0),gp);
+    }
+    for (double yi = 0; yi <= l; yi++) {
+      c.drawLine(p(0,yi,0),p(w,yi,0),gp);
+    }
   }
 
   @override
   bool shouldRepaint(_) => true;
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Selection outline painter — drawn on top of a GLB overlay when selected
+// ─────────────────────────────────────────────────────────────────────────────
 class _SelectionPainter extends CustomPainter {
   final bool isSelected;
   _SelectionPainter(this.isSelected);
@@ -153,6 +162,10 @@ class _SelectionPainter extends CustomPainter {
   bool shouldRepaint(_SelectionPainter old) => old.isSelected != isSelected;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GLB furniture tile — keeps its own ModelViewer alive and puts a transparent
+// GestureDetector ON TOP so the WebView never receives touches.
+// ─────────────────────────────────────────────────────────────────────────────
 class _FurnitureTile extends StatefulWidget {
   final FurnitureItem item;
   final bool isSelected;
@@ -173,15 +186,14 @@ class _FurnitureTile extends StatefulWidget {
 }
 
 class _FurnitureTileState extends State<_FurnitureTile> {
- 
+  // We keep a single ModelViewer alive; only the cameraOrbit changes when
+  // the user rotates, so we key it on the glbAsset path (stable).
   late String _cameraOrbit;
 
   @override
   void initState() {
     super.initState();
     _cameraOrbit = _orbitFor(widget.item.rotationDeg);
-   
-   
   }
 
   @override
@@ -202,7 +214,11 @@ class _FurnitureTileState extends State<_FurnitureTile> {
     return Stack(
       fit: StackFit.expand,
       children: [
-       
+        // ── Real GLB model (WebView, cameraControls OFF) ──────────────────
+        // Key includes rotationDeg so the WebView rebuilds (and re-renders
+        // at the new angle) only when the user explicitly rotates this item.
+        // All other setState calls (drag, select, resize of other items) leave
+        // the key unchanged → no flicker / reload for bystander furniture.
         ModelViewer(
           key: ValueKey('${widget.item.id}_${widget.item.rotationDeg.toStringAsFixed(0)}'),
           src: widget.item.glbAsset,
@@ -217,13 +233,13 @@ class _FurnitureTileState extends State<_FurnitureTile> {
           fieldOfView: '28deg',
         ),
 
-       
+        // ── Selection outline on top of GLB ──────────────────────────────
         CustomPaint(painter: _SelectionPainter(widget.isSelected)),
 
-        
-        
+        // ── Transparent gesture interceptor — sits above WebView ─────────
+        // This widget catches 100 % of touches before the WebView does.
         GestureDetector(
-          behavior: HitTestBehavior.opaque, 
+          behavior: HitTestBehavior.opaque, // opaque = eat every touch
           onTap: widget.onSelect,
           onDoubleTap: widget.onDoubleTap,
           onPanUpdate: widget.onDrag,
@@ -234,7 +250,9 @@ class _FurnitureTileState extends State<_FurnitureTile> {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Catalog picker card
+// ─────────────────────────────────────────────────────────────────────────────
 class _LazyModelCard extends StatefulWidget {
   final FurnitureItem item;
   final VoidCallback onTap;
@@ -249,8 +267,11 @@ class _LazyModelCardState extends State<_LazyModelCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (!_showModel) setState(() => _showModel = true);
-        else widget.onTap();
+        if (!_showModel) {
+          setState(() => _showModel = true);
+        } else {
+          widget.onTap();
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -337,7 +358,9 @@ class _LazyModelCardState extends State<_LazyModelCard> {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Full-screen GLB viewer (one WebView, opened on demand)
+// ─────────────────────────────────────────────────────────────────────────────
 class FurnitureModelViewer extends StatelessWidget {
   final FurnitureItem item;
   const FurnitureModelViewer({super.key, required this.item});
@@ -415,7 +438,9 @@ class FurnitureModelViewer extends StatelessWidget {
   }
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Main screen
+// ─────────────────────────────────────────────────────────────────────────────
 class Room3DScreen extends StatefulWidget {
   final double roomWidth, roomLength, roomHeight;
   final String? referenceImagePath;
@@ -435,13 +460,13 @@ class Room3DScreen extends StatefulWidget {
 class _Room3DScreenState extends State<Room3DScreen> {
   double _scale = 80.0;
   Offset _panOffset = const Offset(220, 160);
-  double _roomRotation = 0.0;
+  final double _roomRotation = 0.0;
   String? _selectedId;
   final List<FurnitureItem> _furniture = [];
   Size _screenSize = Size.zero;
   bool _isSaving = false;
   bool _isLoading = false;
-  static const _baseUrl = 'https://chance-impeding-curable.ngrok-free.dev';
+  static const _baseUrl = 'https://pout-tavern-refuse.ngrok-free.dev';
 
   static final List<FurnitureItem> _catalog = [
     FurnitureItem(id:'sofa',name:'Sofa',emoji:'🛋',type:FurnitureType.sofa,
@@ -514,7 +539,9 @@ class _Room3DScreenState extends State<Room3DScreen> {
     final x = (dx / .866025 + dy / .5) / (2 * _scale);
     final y = (dy / .5 - dx / .866025) / (2 * _scale);
     if (x >= 0 && x <= widget.roomWidth &&
-        y >= 0 && y <= widget.roomLength) return Offset(x, y);
+        y >= 0 && y <= widget.roomLength) {
+      return Offset(x, y);
+    }
     return null;
   }
 

@@ -7,13 +7,12 @@ class HomeController extends ChangeNotifier {
 
   HomeController({required this.repo});
 
-  bool _disposed = false; 
+  bool _disposed = false;
   int unreadNotifCount = 0;
 
   int? userId;
   String? userName;
   bool isLoggedIn = false;
-
 
   List<Product> products = [];
   bool isLoadingProducts = true;
@@ -26,13 +25,11 @@ class HomeController extends ChangeNotifier {
     if (!_disposed) super.notifyListeners();
   }
 
-
-
   Future<void> loadUnreadNotifCount() async {
-  if (userId == null) return;
-  unreadNotifCount = await repo.fetchUnreadNotifCount(userId!);
-  notifyListeners();
-}
+    if (userId == null) return;
+    unreadNotifCount = await repo.fetchUnreadNotifCount(userId!);
+    notifyListeners();
+  }
 
   // Override dispose
   @override
@@ -51,12 +48,20 @@ class HomeController extends ChangeNotifier {
   Future<void> loadInitialData(CartProvider cartProvider) async {
     final futures = <Future>[
       loadProducts(),
-      if (userId != null) loadFavorites(),
-      if (userId != null) loadUnreadCount(),
-      if (userId != null) loadUnreadNotifCount(),
-      if (userId != null) cartProvider.fetchCartCount(userId!),
+      loadUserData(cartProvider),
     ];
     await Future.wait(futures);
+  }
+
+  Future<void> loadUserData(CartProvider cartProvider) async {
+    if (userId == null) return;
+
+    await Future.wait([
+      loadFavorites(),
+      loadUnreadCount(),
+      loadUnreadNotifCount(),
+      cartProvider.fetchCartCount(userId!),
+    ]);
   }
 
   Future<void> loadProducts() async {
@@ -127,12 +132,12 @@ class HomeController extends ChangeNotifier {
   }
 
   void login(Map result, CartProvider cartProvider) {
-    userId = result['user_id'];
+    userId = int.tryParse('${result['user_id']}');
     userName = result['name'];
     isLoggedIn = true;
     notifyListeners();
 
-    loadInitialData(cartProvider);
+    loadUserData(cartProvider);
   }
 
   void updateName(String name) {
@@ -141,12 +146,12 @@ class HomeController extends ChangeNotifier {
   }
 
   void logout(CartProvider cartProvider) {
+    cartProvider.resetCartCount(userId!);
     userId = null;
     userName = null;
     isLoggedIn = false;
     unreadCount = 0;
     favoriteIds.clear();
-    cartProvider.resetCartCount();
     notifyListeners();
   }
 }

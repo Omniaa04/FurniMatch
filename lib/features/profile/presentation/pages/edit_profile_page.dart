@@ -28,51 +28,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
     nameController = TextEditingController(text: widget.currentName);
   }
 
-  Future<void> saveName() async {
-    final name = nameController.text.trim();
+ Future<void> saveName() async {
+  print('=== saveName called ===');
+  
+  final name = nameController.text.trim();
+  print('Name: $name');
 
-    if (name.isEmpty) {
+  if (name.isEmpty) {
+    setState(() => nameError = "Please enter your name");
+    return;
+  }
+
+  setState(() {
+    isSaving = true;
+    nameError = null;
+  });
+
+  try {
+    print('Step 1: Getting baseUrl...');
+    final baseUrl = ApiConfig.baseUrl;
+    print('Step 2: baseUrl = $baseUrl');
+
+    final uri = Uri.parse('$baseUrl/user/update-name');
+    print('Step 3: URI = $uri');
+
+    final body = jsonEncode({'userId': widget.userId, 'name': name});
+    print('Step 4: Body = $body');
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+    print('Step 5: Response status = ${response.statusCode}');
+    print('Step 6: Response body = ${response.body}');
+
+    if (!mounted) return;
+
+    if (response.statusCode == 200) {
+      Navigator.pop(context, name);
+    } else {
       setState(() {
-        nameError = "Please enter your name";
+        nameError = 'Server error ${response.statusCode}: ${response.body}';
+        isSaving = false;
       });
-      return;
     }
+  } catch (e, stack) {
+    print('=== CRASH CAUGHT ===');
+    print('Error: $e');
+    print('Stack: $stack');
 
+    if (!mounted) return;
     setState(() {
-      isSaving = true;
-      nameError = null;
+      nameError = e.toString();
+      isSaving = false;
     });
-
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/user/update-name'),
-        headers: {
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: jsonEncode({
-          "user_id": widget.userId,
-          "name": name,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (data['success'] == true) {
-        Navigator.pop(context, data['name']);
-      } else {
-        setState(() {
-          nameError = data['message'] ?? 'Failed to update name';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        nameError = "Something went wrong. Please try again";
-      });
-    } finally {
+  } finally {
+    if (mounted && isSaving) {
       setState(() => isSaving = false);
     }
   }
+}
 
   @override
   void dispose() {
@@ -139,9 +155,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       CircleAvatar(
                         radius: 42,
                         backgroundColor: brown,
-                        child: const CircleAvatar(
+                        child: CircleAvatar(
                           radius: 38,
-                          backgroundImage: AssetImage('assets/sample2.png'),
+                          backgroundColor: bg,
+                          child: Text(
+                            widget.currentName.isNotEmpty ? widget.currentName[0].toUpperCase() : 'U',
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: brown,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -179,9 +203,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: brown,
+                    fillColor: Colors.white,
                     hintText: "Enter your name",
-                    hintStyle: const TextStyle(color: Colors.white70),
+                    hintStyle: const TextStyle(color: Colors.grey),
                     errorText: nameError,
                     errorStyle: const TextStyle(
                       color: Colors.red,
@@ -200,7 +224,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       borderSide: const BorderSide(color: brown, width: 1.5),
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ],
             ),
