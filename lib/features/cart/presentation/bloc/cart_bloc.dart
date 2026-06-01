@@ -53,6 +53,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     await removeItem(event.itemId);
     add(LoadCartEvent());
   }
+  
 
   Future<void> _onApplyPromoCode(
       ApplyPromoCodeEvent event, Emitter<CartState> emit) async {
@@ -67,4 +68,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(current.copyWith(isShareVisible: !current.isShareVisible));
     }
   }
+
+  
 }

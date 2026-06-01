@@ -301,7 +301,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Email (للعرض فقط) ──────────────────────────────────
+               
                 const Text('Email',
                     style: TextStyle(
                         fontSize: 13,
@@ -336,7 +336,7 @@ class SettingsScreen extends StatelessWidget {
                         fontSize: 11, color: Colors.grey.shade400)),
                 const SizedBox(height: 24),
 
-                // ── Save Button ────────────────────────────────────────
+              
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -385,7 +385,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // ─── Helpers ─────────────────────────────────────────────────────────────
+  
 
   Widget _sectionLabel(String t) => Text(t,
       style: const TextStyle(
@@ -495,7 +495,7 @@ class SettingsScreen extends StatelessWidget {
         ),
       );
 
-  // ─── Dialogs ─────────────────────────────────────────────────────────────
+  
 
   void _confirmClearCache(BuildContext context) {
     showCupertinoDialog(
@@ -630,7 +630,6 @@ class SettingsScreen extends StatelessWidget {
       );
 }
 
-// ─── Profile Card Widget ──────────────────────────────────────────────────────
 
 class _ProfileCard extends StatelessWidget {
   final String name;

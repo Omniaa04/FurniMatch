@@ -567,16 +567,16 @@ class _CartPageState extends State<CartPage> {
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                         child: CartSummaryCard(
                           summary: state.summary,
-                          userId: widget.userId, // ✅
+                          userId: widget.userId, 
                         ),
                       ),
                     ],
                   ),
                   if (state.isShareVisible)
-                    const Positioned(
+                     Positioned(
                       top: 70,
                       right: 16,
-                      child: ShareCartOverlay(),
+                      child: ShareCartOverlay(shareUrl: 'https://chance-impeding-curable.ngrok-free.dev/cart/shared/${widget.userId}'),
                     ),
                 ],
               );
@@ -598,6 +598,7 @@ class _CartAppBar extends StatelessWidget {
     required this.isShareVisible,
     required this.userId,
   });
+
 
   @override
   Widget build(BuildContext context) {

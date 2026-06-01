@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:furnimatch/features/buttom_nav/main_shell.dart';
 
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
@@ -55,15 +56,15 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString('name', user.name);
     await prefs.setString('role', user.role);
 
-    print("✅ Saved user_id: ${user.userId}");
+    print(" Saved user_id: ${user.userId}");
 
     if (!mounted) return;
 
-    Navigator.pop(context, {
-      'user_id': user.userId,
-      'name': user.name,
-      'role': user.role,
-    });
+   Navigator.pop(context, {
+  'user_id': user.userId,
+  'name': user.name,
+  'role': user.role,
+});
   } catch (e) {
     if (!mounted) return;
 

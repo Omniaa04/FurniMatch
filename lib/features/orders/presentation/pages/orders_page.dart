@@ -12,7 +12,7 @@ import '../cubit/orders_cubit.dart';
 
 class OrdersPage extends StatelessWidget {
   final int customerId; // the logged-in user's id
-  const OrdersPage({Key? key, required this.customerId}) : super(key: key);
+  const OrdersPage({super.key, required this.customerId});
 
   @override
   Widget build(BuildContext context) {

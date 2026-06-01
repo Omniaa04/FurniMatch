@@ -667,6 +667,7 @@ import 'package:furnimatch/features/points/data/repository/points_repository_imp
 import 'package:furnimatch/features/points/domain/usecases/points_usecases.dart';
 import 'package:furnimatch/features/points/presentation/bloc/points_bloc.dart';
 import 'package:furnimatch/features/points/presentation/screen/points_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   final int? userId;
@@ -976,9 +977,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
       controller.logout(context.read<CartProvider>());
       widget.onAuthChanged?.call(null, null);
-      Navigator.of(context).pop();
     }
   }
 

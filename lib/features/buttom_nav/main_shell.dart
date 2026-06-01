@@ -15,6 +15,7 @@ import 'package:furnimatch/features/chat/presentation/pages/user_chat_list_page.
 import 'package:furnimatch/features/home/presentation/pages/home_page.dart';
 import 'package:furnimatch/features/profile/presentation/pages/profile_page.dart';
 import 'package:furnimatch/providers/cart_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainShell extends StatefulWidget {
   final int? userId;
@@ -142,8 +143,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       if (mounted) setState(() => unreadCount = 0);
     }
   }
-
-  void updateAuth(int? id, String? name) {
+ void updateAuth(int? id, String? name) {
     setState(() {
       userId = id;
       userName = name;

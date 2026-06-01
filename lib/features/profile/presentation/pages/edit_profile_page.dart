@@ -46,7 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   try {
     print('Step 1: Getting baseUrl...');
-    final baseUrl = ApiConfig.baseUrl;
+    const baseUrl = ApiConfig.baseUrl;
     print('Step 2: baseUrl = $baseUrl');
 
     final uri = Uri.parse('$baseUrl/user/update-name');

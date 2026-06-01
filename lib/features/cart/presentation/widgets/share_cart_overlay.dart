@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShareCartOverlay extends StatelessWidget {
-  const ShareCartOverlay({super.key});
+  final String shareUrl;
 
-  static const List<String> _contacts = [
-    'Omnia Abdelhamid',
-    'Shahd Elsayed',
-    'Shahd Alaa',
-    'Rana Ahmed',
-    'Haidy Ayman',
-  ];
+  const ShareCartOverlay({
+    super.key,
+    required this.shareUrl,
+  });
+
+  void _copyLink(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: shareUrl));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Link copied to clipboard')),
+    );
+  }
+
+  Future<void> _shareViaWhatsApp() async {
+    final uri = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(shareUrl)}');
+  await launchUrl(uri);
+  }
+
+  void _shareViaFacebook() async {
+  final uri = Uri.parse('https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(shareUrl)}');
+  await launchUrl(uri);
+}
+
+  void _shareViaInstagram(BuildContext context) async {
+  // Instagram has no direct share URL, so just copy the link
+  Clipboard.setData(ClipboardData(text: shareUrl));
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Link copied — paste it in Instagram')),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -32,32 +56,6 @@ class ShareCartOverlay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
-            'share cart to:',
-            style: TextStyle(
-              fontSize: 12,
-              fontFamily: "Baloo2",
-              color: Color(0xFF9E9E9E),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ..._contacts.map((name) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontFamily: "Baloo2",
-                      color: Color(0xFF3A2E26),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              )),
-          const SizedBox(height: 12),
-          const Text(
             'share via',
             style: TextStyle(
               fontSize: 12,
@@ -66,20 +64,33 @@ class ShareCartOverlay extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Row(
+          Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _SocialIcon(icon: Icons.link, color: Color(0xFF8B7355)),
-              SizedBox(width: 10),
               _SocialIcon(
-                  icon: Icons.message,
-                  color: Color(0xFF25D366),
-                  isWhatsApp: true),
-              SizedBox(width: 10),
-              _SocialIcon(icon: Icons.facebook, color: Color(0xFF1877F2)),
-              SizedBox(width: 10),
+                icon: Icons.link,
+                color: const Color(0xFF8B7355),
+                onTap: () => _copyLink(context),
+              ),
+              const SizedBox(width: 10),
               _SocialIcon(
-                  icon: Icons.camera_alt, color: Color(0xFFE1306C)),
+                icon: Icons.message,
+                color: const Color(0xFF25D366),
+                isWhatsApp: true,
+                onTap: _shareViaWhatsApp,
+              ),
+              const SizedBox(width: 10),
+              _SocialIcon(
+                icon: Icons.facebook,
+                color: const Color(0xFF1877F2),
+                onTap: _shareViaFacebook,
+              ),
+              const SizedBox(width: 10),
+              _SocialIcon(
+                icon: Icons.camera_alt,
+                color: const Color(0xFFE1306C),
+                onTap: () => _shareViaInstagram(context),
+              ),
             ],
           ),
         ],
@@ -92,17 +103,19 @@ class _SocialIcon extends StatelessWidget {
   final IconData icon;
   final Color color;
   final bool isWhatsApp;
+  final VoidCallback onTap;
 
   const _SocialIcon({
     required this.icon,
     required this.color,
+    required this.onTap,
     this.isWhatsApp = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         width: 36,
         height: 36,

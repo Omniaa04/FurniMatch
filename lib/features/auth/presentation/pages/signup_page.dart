@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:furnimatch/features/buttom_nav/main_shell.dart';
 
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
@@ -56,15 +57,15 @@ await prefs.setInt('user_id', int.parse(user.userId.toString()));
 await prefs.setString('name', user.name);
 await prefs.setString('role', user.role);
 
-print("✅ Saved signup user_id: ${user.userId}");
+print(" Saved signup user_id: ${user.userId}");
 
       if (!mounted) return;
 
-      Navigator.pop(context, {
-        'user_id': user.userId,
-        'name': user.name,
-        'role': user.role,
-      });
+     Navigator.pop(context, {
+  'user_id': user.userId,
+  'name': user.name,
+  'role': user.role,
+});
     } catch (e) {
       if (!mounted) return;
 

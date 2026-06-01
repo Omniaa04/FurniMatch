@@ -1457,8 +1457,8 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 10),
         contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.logout, color: Color(0xFFFF5A5F), size: 28),
             SizedBox(width: 12),
             Text(
