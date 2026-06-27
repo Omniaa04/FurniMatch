@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final HomeController controller;
   String? profileImageUrl;
 
-  // ── Room Measure Popup ────────────────────────────────────────────────────
+ 
   bool _showMeasureTip = false;
 
   final GlobalKey _cameraKey = GlobalKey();
@@ -97,13 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void dispose() {
-    _removeOverlay();
-    controller.dispose();
-    super.dispose();
-  }
+void dispose() {
+  _removeOverlay(rebuild: false);
+  controller.dispose();
+  super.dispose();
+}
 
-  // ── Overlay helpers ───────────────────────────────────────────────────────
+  
 
   void _showOverlay() {
     _removeOverlay();
@@ -154,11 +154,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Overlay.of(context).insert(_overlayEntry!);
   }
 
-  void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-    if (mounted) setState(() => _showMeasureTip = false);
+  void _removeOverlay({bool rebuild = true}) {
+  _overlayEntry?.remove();
+  _overlayEntry = null;
+
+  if (rebuild && mounted) {
+    setState(() => _showMeasureTip = false);
   }
+}
 
   void _toggleOverlay() {
   if (_showMeasureTip) {
@@ -174,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  
 
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
