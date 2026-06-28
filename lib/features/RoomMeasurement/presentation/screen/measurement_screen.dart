@@ -7,11 +7,11 @@ import '../../data/datasource/camera_measurement_service.dart';
 import '../../data/repository/measurement_repository_impl.dart';
 import '../../domain/models/room_dimensions.dart';
 import '../../domain/usecases/measure_room_usecase.dart';
-// ── import your existing 3D screen ──────────────────────────────────────────
+//  import existing 3D screen 
 import '/features/RoomMeasurement/presentation/screen/room_3d_screen.dart';
 import 'package:furnimatch/features/RoomMeasurement/presentation/screen/room_name_screen.dart';
 
-// ─── Brand Colors ─────────────────────────────────────────────────────────────
+//Brand Colors 
 class AppColors {
   static const primary    = Color(0xFFCF8D5B);
   static const dark       = Color(0xFF7D533D);

@@ -44,5 +44,24 @@ void main() {
         verifyNoMoreInteractions(mockRepository);
       },
     );
+
+
+    test(
+  'should throw an exception when repository fails',
+  () async {
+    // Arrange
+    when(() => mockRepository.getArModel(any()))
+        .thenThrow(Exception('AR model not found'));
+
+    // Act & Assert
+    expect(
+      () => getArModelUseCase(101),
+      throwsException,
+    );
+
+    verify(() => mockRepository.getArModel(101)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
   });
 }

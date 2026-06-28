@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../../domain/models/room_dimensions.dart';
 import '../../domain/usecases/measure_room_usecase.dart';
 
-// ─── Events ──────────────────────────────────────────────────────────────────
+
 abstract class MeasurementEvent extends Equatable {
   const MeasurementEvent();
   @override
@@ -22,7 +22,7 @@ class LoadLastMeasurementEvent extends MeasurementEvent {
   const LoadLastMeasurementEvent();
 }
 
-// ─── States ───────────────────────────────────────────────────────────────────
+
 abstract class MeasurementState extends Equatable {
   const MeasurementState();
   @override
@@ -51,7 +51,7 @@ class MeasurementFailure extends MeasurementState {
   List<Object?> get props => [message];
 }
 
-// ─── BLoC ─────────────────────────────────────────────────────────────────────
+
 class MeasurementBloc extends Bloc<MeasurementEvent, MeasurementState> {
   final MeasureRoomUseCase measureRoomUseCase;
   final GetLastMeasurementUseCase getLastMeasurementUseCase;

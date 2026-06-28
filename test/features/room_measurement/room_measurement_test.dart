@@ -58,5 +58,89 @@ void main() {
         verifyNoMoreInteractions(mockRepository);
       },
     );
+
+
+    test(
+  'should throw an exception if measuring the room fails',
+  () async {
+    // Arrange
+    when(() => mockRepository.measureRoom())
+        .thenThrow(Exception('Measurement failed'));
+
+    // Act & Assert
+    expect(
+      () => measureRoomUseCase(),
+      throwsException,
+    );
+
+    verify(() => mockRepository.measureRoom()).called(1);
+    verifyNever(() => mockRepository.saveLastMeasurement(any()));
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
+
+
+test(
+  'should return zero area and volume for an empty room',
+  () async {
+    // Arrange
+    final dimensions = RoomDimensions(
+      length: 0,
+      width: 0,
+      height: 0,
+      measuredAt: DateTime(2025, 1, 1),
+    );
+
+    when(() => mockRepository.measureRoom())
+        .thenAnswer((_) async => dimensions);
+
+    when(() => mockRepository.saveLastMeasurement(dimensions))
+        .thenAnswer((_) async {});
+
+    // Act
+    final result = await measureRoomUseCase();
+
+    // Assert
+    expect(result.area, 0);
+    expect(result.volume, 0);
+
+    verify(() => mockRepository.measureRoom()).called(1);
+    verify(() => mockRepository.saveLastMeasurement(dimensions)).called(1);
+
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
+test(
+  'should return the measured room dimensions',
+  () async {
+    // Arrange
+    final dimensions = RoomDimensions(
+      length: 6,
+      width: 5,
+      height: 3,
+      measuredAt: DateTime(2025, 1, 1),
+    );
+
+    when(() => mockRepository.measureRoom())
+        .thenAnswer((_) async => dimensions);
+
+    when(() => mockRepository.saveLastMeasurement(dimensions))
+        .thenAnswer((_) async {});
+
+    // Act
+    final result = await measureRoomUseCase();
+
+    // Assert
+    expect(result, equals(dimensions));
+    expect(result.length, 6);
+    expect(result.width, 5);
+    expect(result.height, 3);
+
+    verify(() => mockRepository.measureRoom()).called(1);
+    verify(() => mockRepository.saveLastMeasurement(dimensions)).called(1);
+
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
   });
 }

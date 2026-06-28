@@ -56,5 +56,117 @@ void main() {
         verifyNoMoreInteractions(mockRepository);
       },
     );
+   //news
+   test(
+  'LoginUseCase should throw Exception when repository login fails',
+  () async {
+    // Arrange
+    when(
+      () => mockRepository.login(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
+    ).thenThrow(Exception('Invalid credentials'));
+
+    // Act & Assert
+    expect(
+      () => loginUseCase(
+        email: 'wrong@test.com',
+        password: 'wrong123',
+      ),
+      throwsA(isA<Exception>()),
+    );
+
+    verify(
+      () => mockRepository.login(
+        email: 'wrong@test.com',
+        password: 'wrong123',
+      ),
+    ).called(1);
+
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
+
+
+test(
+  'LoginUseCase should return another AuthUser correctly',
+  () async {
+    // Arrange
+    final user = AuthUser(
+      userId: 25,
+      name: 'Ali',
+      role: 'admin',
+    );
+
+    when(
+      () => mockRepository.login(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => user);
+
+    // Act
+    final result = await loginUseCase(
+      email: 'ali@test.com',
+      password: 'admin123',
+    );
+
+    // Assert
+    expect(result.userId, 25);
+    expect(result.name, 'Ali');
+    expect(result.role, 'admin');
+
+    verify(
+      () => mockRepository.login(
+        email: 'ali@test.com',
+        password: 'admin123',
+      ),
+    ).called(1);
+
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
+
+
+
+test(
+  'LoginUseCase should return exactly the repository object',
+  () async {
+    // Arrange
+    final user = AuthUser(
+      userId: 7,
+      name: 'Mona',
+      role: 'customer',
+    );
+
+    when(
+      () => mockRepository.login(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => user);
+
+    // Act
+    final result = await loginUseCase(
+      email: 'mona@test.com',
+      password: 'password',
+    );
+
+    // Assert
+    expect(identical(result, user), isTrue);
+
+    verify(
+      () => mockRepository.login(
+        email: 'mona@test.com',
+        password: 'password',
+      ),
+    ).called(1);
+
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
+
+
   });
 }

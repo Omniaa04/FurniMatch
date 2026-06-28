@@ -45,5 +45,23 @@ void main() {
         verifyNoMoreInteractions(mockRepository);
       },
     );
+
+    test(
+  'should throw an exception when repository fails to get cart summary',
+  () async {
+    // Arrange
+    when(() => mockRepository.getCartSummary(any()))
+        .thenThrow(Exception('Failed to load cart summary'));
+
+    // Act & Assert
+    expect(
+      () => getCartSummaryUseCase(null),
+      throwsException,
+    );
+
+    verify(() => mockRepository.getCartSummary(null)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  },
+);
   });
 }
